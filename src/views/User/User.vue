@@ -1,88 +1,76 @@
 <template>
-  <div>
-    <img src="https://ws1.sinaimg.cn/large/663d3650gy1fq685v5csyj208c06ygm0.jpg" style="width: 100%">
-    <search
-      @result-click="resultClick"
-      @on-change="getResult"
-      :results="results"
-      v-model="value"
-      position="static"
-      auto-scroll-to-top
-      top="46px"
-      @on-focus="onFocus"
-      @on-cancel="onCancel"
-      @on-submit="onSubmit"
-      ref="search"></search>
-    <group>
-      <cell title="keyword">{{ value }}</cell>
-    </group>
-
-    <div style="padding:15px;">
-      <x-button
-        @click.native="setFocus"
-        type="primary">set focus</x-button>
-    </div>
-    <group>
-      <cell
-        title="static position demo"
-        is-link
-        link="/component/search-static"></cell>
-    </group>
+  <div class="explore_container">
+    <x-header>
+      <span slot="overwrite-left"></span> 我的
+    </x-header>
+    <scroller
+      class="scroll"
+      lock-x
+      :height="scrollBoxHeight"
+      @on-scroll-bottom="onScrollBottom"
+      ref="scrollerBottom"
+      :scroll-bottom-offst="200"
+    >
+      <div>
+         <panel :list="personalList" type='1'></panel>
+        <group v-for="(list,index) in listData" :key="index">
+          <cell is-link :title="item.name" v-for="(item,i) in list" :key="i">
+            <img slot="icon" width="35" style="display:block;margin-right:15px; " :src="item.icon" />
+          </cell>
+        </group>
+      </div>
+    </scroller>
   </div>
 </template>
 
 <script>
-import { Search, Group, Cell, XButton } from 'vux'
-
 export default {
-  components: {
-    Search,
-    Group,
-    Cell,
-    XButton
-  },
-  methods: {
-    setFocus () {
-      this.$refs.search.setFocus()
-    },
-    resultClick (item) {
-      window.alert('you click the result item: ' + JSON.stringify(item))
-    },
-    getResult (val) {
-      console.log('on-change', val)
-      this.results = val ? getResult(this.value) : []
-    },
-    onSubmit () {
-      this.$refs.search.setBlur()
-      this.$vux.toast.show({
-        type: 'text',
-        position: 'top',
-        text: 'on submit'
-      })
-    },
-    onFocus () {
-      console.log('on focus')
-    },
-    onCancel () {
-      console.log('on cancel')
-    }
-  },
   data () {
     return {
-      results: [],
-      value: 'test'
+      personalList: [
+        {
+          src: require('../../assets/avartar.png'),
+          fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
+          title: '米高',
+          desc:
+            '微信号：soymikey',
+          url: '/conversation'
+        }],
+      listData: {
+        list: [
+          { name: '支付', icon: require('../../assets/userpng/pay.png') }
+
+        ],
+        list2: [
+          { name: '收藏', icon: require('../../assets/userpng/collection.png') },
+          { name: '相册', icon: require('../../assets/userpng/album.png') },
+          { name: '卡包', icon: require('../../assets/userpng/card_bag.png') },
+          { name: '表情', icon: require('../../assets/userpng/emoji.png') }
+
+        ],
+        list3: [ { name: '设置', icon: require('../../assets/userpng/setting.png') }
+        ]
+
+      },
+      scrollBoxHeight: ''
+
+    }
+  },
+  created () {},
+  mounted () {
+    this.scrollBoxHeight = document.documentElement.clientHeight - 46 - 54 + 'px'
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    onScrollBottom () {
+      console.log('onScrollBottom')
     }
   }
 }
-
-function getResult (val) {
-  let rs = []
-  for (let i = 0; i < 20; i++) {
-    rs.push({
-      title: `${val} result: ${i + 1} `,
-      other: i
-    })
-  }
-  return rs
-}
 </script>
+<style lang="scss">
+.scroll {
+  background-color: #f7f7fa;
+}
+</style>

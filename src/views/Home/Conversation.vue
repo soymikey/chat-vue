@@ -6,34 +6,33 @@
       :height="scrollBoxHeight"
       @on-scroll-bottom="onScrollBottom"
       ref="scrollerBottom"
-      :scroll-bottom-offst="200"
+      :scroll-bottom-offst="250"
     >
       <div>
-        <!-- <cell v-for="item in messageList" :key="item">
-
-          <span slot="title" style="color:green;">
-             <div :class="item.sender==='michael'?'other_message_box':'my_message_box'">
-              {{item.message}}
-               <span :class="item.sender==='michael'?'other_spike':'my_spike'"></span>
-            </div>
-          </span>
-          <img
-            class="my_avartar"
-            :slot=" item.sender==='michael'?'value':'icon'"
-            width="35"
-            style="display:block;"
-            :src="item.sender==='michael'?me:other"
-          />
-        </cell>-->
         <div v-for="item in messageList" :key="item" class="coversation_box-container">
-
-          <img class="other_avatar" width="35" height="35" :src="item.sender==='michael'?me:other" />
-          <div :class="item.sender==='michael'?'other_message_box':'my_message_box'">
-            {{item.message}}
-            <span :class="item.sender==='michael'?'other_spike':'my_spike'"></span>
+          <div class="other_avatar_container">
+            <img
+              width="35"
+              height="35"
+              :src="item.sender==='michael'?me:other"
+              v-show="item.sender!=='michael'"
+            />
           </div>
-          <img class="my_avartar"  width="35" height="35" :src="item.sender==='michael'?me:other" />
+
+          <div :class="item.sender==='michael'?'my_message_box':'other_message_box'">
+            {{item.message}}
+            <span :class="item.sender==='michael'?'my_spike':'other_spike'"></span>
+          </div>
+          <div class="my_avartar-container">
+            <img
+              width="35"
+              height="35"
+              :src="item.sender==='michael'?me:other"
+              v-show="item.sender==='michael'"
+            />
+          </div>
         </div>
+        <div style="height:30px"></div>
       </div>
     </scroller>
 
@@ -178,73 +177,62 @@ export default {
 .explore_container {
   background-color: #f7f7fa;
 }
-// .my_message_box {
-//   background-color: #fff;
-//   padding: 10px;
-//   width: 75%;
-//   position: relative;
-//   margin-left: 5%;
-// }
-// .my_spike {
-//   display: block;
-//   background: #fff;
 
-//   height: 10px;
-//   width: 10px;
-//   position: absolute;
-//   top: 15%;
-//   left: -2%;
-//   transform: translate(-50%, -50%);
-//   transform: rotate(45deg);
-// }
-// .other_message_box {
-//   background-color: #fff;
-//   padding: 10px;
-//   width: 75%;
-//   position: relative;
-//   left: 60px;
-// }
-// .other_spike {
-//   display: block;
-//   background: #fff;
-//   height: 10px;
-//   width: 10px;
-//   position: absolute;
-//   top: 15%;
-//   right: -2%;
-//   transform: translate(-50%, -50%);
-//   transform: rotate(45deg);
-// }
-// .weui-cell:before{
-// border:0px solid #D9D9D9
-// }
-// .weui-cell:after{
-// border:0px solid #D9D9D9
-// }
 .coversation_box-container {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
   margin-top: 10px;
-  .other_avatar {
-    display: block;
+  .other_avatar_container {
+    display: flex;
+    align-items: center;
     flex: 1;
-    padding: 10px
+    padding-left: 10px;
+    padding-right: 10px;
   }
-  .my_avartar {
-    display: block;
+  .my_avartar-container {
+    display: flex;
+    align-items: center;
     flex: 1;
-     padding: 10px
+    padding-left: 10px;
+    padding-right: 10px;
   }
   .other_message_box {
     flex: 8;
     background-color: #fff;
-    padding: 10px
+    padding: 10px;
+    border-radius: 3%;
+    position: relative;
   }
   .my_message_box {
     flex: 8;
-     background-color: #fff;
-    padding: 10px
+    background-color: #5fc9f8;
+    padding: 10px;
+    border-radius: 3%;
+    position: relative;
+  }
+  .my_spike {
+    background: #5fc9f8;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    right: -3px;
+    top: 4px;
+
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);
+  }
+  .other_spike {
+    background: #fff;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    right: -3px;
+    top: 4px;
+
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);
   }
 }
+
 </style>

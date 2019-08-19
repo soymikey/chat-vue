@@ -11,6 +11,8 @@ const Conversation = r => require.ensure([], () => r(require('@/views/Home/Conve
 const Contact = r => require.ensure([], () => r(require('@/views/Contact/Contact')), 'Contact')
 const Explore = r => require.ensure([], () => r(require('@/views/Explore/Explore')), 'Explore')
 const User = r => require.ensure([], () => r(require('@/views/User/User')), 'User')
+const Login = r => require.ensure([], () => r(require('@/views/Login')), 'Login')
+const Register = r => require.ensure([], () => r(require('@/views/Register')), 'Register')
 
 Vue.use(Router)
 
@@ -56,6 +58,16 @@ export default new Router({
           path: '/user',
           name: 'user',
           component: User
+        },
+        {
+          path: '/login',
+          name: 'login',
+          component: Login
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: Register
         }
       ]
 

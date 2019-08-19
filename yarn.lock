@@ -9347,6 +9347,11 @@ vary@~1.1.2:
   resolved "https://registry.npm.taobao.org/vary/download/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
 
+vchat-regcode@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.npm.taobao.org/vchat-regcode/download/vchat-regcode-0.0.3.tgz#bdee478394f609acd3fefef76ded19468ff3791b"
+  integrity sha1-ve5Hg5T2CazT/v73be0ZRo/zeRs=
+
 vendors@^1.0.0:
   version "1.0.3"
   resolved "https://registry.npm.taobao.org/vendors/download/vendors-1.0.3.tgz#a6467781abd366217c050f8202e7e50cc9eef8c0"

@@ -5,7 +5,7 @@ import store from './store'
 
 // import 'normalize.css'
 import 'vux/src/styles/reset.less'
-import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Panel, XImg, LoadMore, XInput, Actionsheet } from 'vux'
+import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Panel, XImg, LoadMore, XInput, Actionsheet, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
 Vue.config.productionTip = false
 Vue.component('x-button', XButton)
 Vue.component('tabbar', Tabbar)
@@ -21,6 +21,11 @@ Vue.component('x-img', XImg)
 Vue.component('load-more', LoadMore)
 Vue.component('actionsheet', Actionsheet)
 Vue.component('x-input', XInput)
+Vue.component('badge', Badge)
+Vue.component('button-tab', ButtonTab)
+Vue.component('button-tab-item', ButtonTabItem)
+Vue.component('toast', Toast)
+Vue.use(ToastPlugin)
 
 new Vue({
   router,

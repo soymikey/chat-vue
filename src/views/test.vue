@@ -21,23 +21,15 @@
         </cell>
       </div>
 </div></template>
- <div>
-        <cell v-for="item in messageList" :key="item">
-          <span slot="title" style="color:green;">
-            <div class="my_message_box">
-              {{item.message}}
-              <span class="my_spike"></span>
-            </div>
-          </span>
-          <img
-            class="my_avartar"
-            slot="icon"
-            width="35"
-            style="display:block;margin-right:5px;"
-            :src="other"
-          />
-        </cell>
-      </div>
+  <div v-for="item in messageList" :key="item" class="coversation_box-container">
+ <!-- <div class="other_avatar_container"></div> -->
+          <img class="other_avatar" width="35" height="35" :src="item.sender==='michael'?me:other"  />
+          <div :class="item.sender==='michael'?'other_message_box':'my_message_box'">
+            {{item.message}}
+            <span :class="item.sender==='michael'?'other_spike':'my_spike'"></span>
+          </div>
+          <img class="my_avartar"  width="35" height="35" :src="item.sender==='michael'?me:other" />
+        </div>
 <script>
 export default {
   data () {
