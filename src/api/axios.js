@@ -1,17 +1,24 @@
 import axios from 'axios'
-import { Message } from 'element-ui'
-import router from '../router'
-let instance = axios.create({
-  baseURL: '/'
-})
 
-// const instance = axios.create({
-//   baseURL:
-//     process.env.NODE_ENV === 'development'
-//       ? 'http://127.0.0.1:4000/api'
-//       : 'http://pos.migaox.com/api', // api的base_url
-//   timeout: 20000 // 请求超时时间
+import router from '../router'
+
+const toast = (text, type) => {
+  this.$vux.toast.show({
+    text,
+    type
+  })
+}
+// let instance = axios.create({
+//   baseURL: '/'
 // })
+
+const instance = axios.create({
+  baseURL:
+    process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8899/'
+      : 'http://pos.migaox.com/', // api的base_url
+  timeout: 20000 // 请求超时时间
+})
 // http request 请求拦截器，有token值则配置上token值
 /* axios.interceptors.request.use(
  config => {
@@ -38,20 +45,23 @@ instance.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // 这里写清除token的代码
-          router.replace('/')
-          Message.error('登录信息过期或未授权，请重新登录！')
+          router.replace('/register')
+          toast('登录信息过期或未授权，请重新登录', 'cancel')
+
           break
         case 403:
-          Message.error('拒绝访问！')
+          toast('拒绝访问！', 'cancel')
           break
         case 404:
-          Message.error('请求错误,未找到该资源！')
+          toast('请求错误,未找到该资源！', 'cancel')
           break
         case 500:
-          Message.err('服务器出问题了，请稍后再试！')
+          toast('服务器出问题了，请稍后再试！', 'cancel')
+
           break
         default:
-          Message.err(`连接错误 ${error.response.status}！`)
+          toast(`连接错误 ${error.response.status}！`, 'cancel')
+
           break
       }
     }

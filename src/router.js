@@ -17,8 +17,8 @@ const Register = r => require.ensure([], () => r(require('@/views/Register')), '
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+  // mode: 'history',
+  // base: process.env.BASE_URL,
   routes: [
     {
       path: '/',

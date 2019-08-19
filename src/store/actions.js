@@ -12,7 +12,7 @@ export default {
         dispatch('getVchatInfo')
         if (that) {
           that.loading = false
-          that.$router.replace('/main/personalMain')
+          that.$router.replace('/home')
         }
       } else {
         commit('setUser', '')
