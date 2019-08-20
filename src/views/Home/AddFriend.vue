@@ -1,31 +1,25 @@
 <template>
   <div class="explore_container">
-    <x-header >添加朋友</x-header>
-    <search
+    <x-header>添加朋友</x-header>
 
-      v-model="value"
-      position="absolute"
-      auto-scroll-to-top
-      top="46px"
+    <search v-model="huntKey" position="absolute" auto-scroll-to-top top="46px" ref="search"></search>
 
-      ref="search"></search>
-       <scroller
+    <scroller
       class="scroll"
       lock-x
       :height="scrollBoxHeight"
       ref="scrollerBottom"
       :scroll-bottom-offst="200"
     >
-    <div>
-        <div v-for="(item,index) in list" :key="index">
+      <div>
+        <div v-for="(item,index) in friendList" :key="index" @click='goFriendDetail(item._id)'>
           <panel>
             <div slot="body" class="panel_container">
               <div class="avartar_container">
-                <img width="100%" :src="item.src" />
-
+                <img width="100%" :src="IMG_URL+ item.photo" />
               </div>
               <div class="body">
-                <div class="title">{{item.title}}</div>
+                <div class="title">{{item.nickname}}</div>
               </div>
             </div>
           </panel>
@@ -37,38 +31,96 @@
 </template>
 
 <script>
+import api from '@/api'
+import { imgUrl } from '../../../config/env'
+
 export default {
   data () {
     return {
-      list: [
+      scrollBoxHeight: '',
+      friendList: [],
+      huntKey: '', // 搜索参数
+      loadingSearch: false, // 加载动画
+      IMG_URL: imgUrl,
+      searchOptions: [
         {
-          src: require('../../assets/me.jpg'),
-          fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-          title: '标题一',
-          desc:
-            '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-          url: '/conversation'
+          value: '2',
+          label: '昵称'
+        },
+        {
+          value: '1',
+          label: 'Vchat号'
         }
-      ]
+      ],
+      type: '2'
     }
   },
   created () {},
 
   mounted () {
-    this.scrollBoxHeight =
-      document.documentElement.clientHeight - 46 + 'px'
+    this.scrollBoxHeight = document.documentElement.clientHeight - 46 + 'px'
   },
 
-  computed: {
+  computed: {},
 
+  watch: {
+    huntKey () {
+      this.huntFriends()
+    }
   },
-  watch: {},
-  methods: {}
+  methods: {
+    goFriendDetail (id) {
+      this.$router.push({ name: 'frienddetail', params: { id: id } })
+    },
+    huntFriends (t) {
+      // 搜索群聊
+      if (this.loadingSearch) {
+        return
+      }
+      if (!this.huntKey) {
+        if (t === 'click') {
+          return
+        }
+        this.loadingSearch = true
+        setTimeout(_ => {
+          this.friendList = []
+          this.loadingSearch = false
+        }, 800)
+        return
+      }
+      if (this.type === '1') {
+        // 按群号查找 需要输入3位以上字符
+        if (this.huntKey.length <= 3) {
+          this.loadingSearch = true
+          setTimeout(_ => {
+            this.friendList = []
+            this.loadingSearch = false
+          }, 800)
+          return
+        }
+      }
+
+      this.loadingSearch = true
+      let params = {
+        key: this.huntKey,
+        offset: 1,
+        limit: 8,
+        type: this.type
+      }
+      api.huntFriends(params).then(r => {
+        if (r.code === 0) {
+          this.friendList = r.data
+        }
+        this.loadingSearch = false
+      })
+    }
+  }
 }
 </script>
 <style lang="scss">
 .scroll {
   background-color: #f7f7fa;
+  padding-top: 44px;
 }
 .panel_container {
   display: flex;

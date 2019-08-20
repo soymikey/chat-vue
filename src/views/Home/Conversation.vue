@@ -4,12 +4,11 @@
     <scroller
       lock-x
       :height="scrollBoxHeight"
-      @on-scroll-bottom="onScrollBottom"
       ref="scrollerBottom"
       :scroll-bottom-offst="250"
     >
       <div>
-        <div v-for="item in messageList" :key="item" class="coversation_box-container">
+        <div v-for="(item,index) in messageList" :key="index" class="coversation_box-container">
           <div class="other_avatar_container">
             <img
               width="35"
@@ -163,6 +162,7 @@ export default {
       ]
     }
   },
+
   created () {},
   mounted () {
     this.scrollBoxHeight =

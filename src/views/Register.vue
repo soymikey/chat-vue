@@ -76,9 +76,21 @@ export default {
     },
     loginTab () {
       this.initRegcode()
+      this.signForm = {
+        name: '',
+        pass: '',
+        repass: '',
+        regcode: ''
+      }
     },
     registerTab () {
       this.initRegcode()
+      this.signForm = {
+        name: '',
+        pass: '',
+        repass: '',
+        regcode: ''
+      }
     },
     onScrollBottom () {},
     toast (text, type = 'success') {

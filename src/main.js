@@ -6,21 +6,11 @@ import store from './store'
 // import 'normalize.css'
 import 'vux/src/styles/reset.less'
 import VueSocketio from 'vue-socket.io'
-import Socketio from 'socket.io-client'
-import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Panel, XImg, LoadMore, XInput, Actionsheet, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
+import socketio from 'socket.io-client'
+import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
 
-// Vue.use(new VueSocketio, socketio(process.env.SOCKETIO))
-// Vue.use(VueSocketio, 'http://localhost:8899')
-Vue.use(new VueSocketio({
-  debug: true,
-  connection: Socketio('http://localhost:8899', {}), // options object is Optional
-  vuex: {
-    store,
-    actionPrefix: 'SOCKET_',
-    mutationPrefix: 'SOCKET_'
-  }
-})
-)
+Vue.use(VueSocketio, socketio('http://localhost:9988/'))
+
 Vue.component('x-button', XButton)
 Vue.component('tabbar', Tabbar)
 Vue.component('tabbar-item', TabbarItem)
@@ -39,6 +29,8 @@ Vue.component('badge', Badge)
 Vue.component('button-tab', ButtonTab)
 Vue.component('button-tab-item', ButtonTabItem)
 Vue.component('toast', Toast)
+Vue.component('x-textarea', XTextarea)
+Vue.component('confirm', Confirm)
 Vue.use(ToastPlugin)
 Vue.config.productionTip = false
 new Vue({

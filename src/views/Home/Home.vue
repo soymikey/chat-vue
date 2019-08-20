@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- {{conversationsList}} -->
     <x-header
       :left-options="{showBack: false}"
       :right-options="{showMore: true}"
@@ -17,8 +18,8 @@
       @on-pulldown-loading="refresh"
     >
       <div>
-        <div v-for="(item,index) in list" :key="index">
-          <panel>
+        <div v-for="(item,index) in list" :key="index" @click="goToConversation(item)">
+          <panel >
             <div slot="body" class="panel_container">
               <div class="avartar_container">
                 <img width="100%" :src="item.src" />
@@ -42,6 +43,7 @@
 
 <script>
 import { TransferDom } from 'vux'
+import { mapState } from 'vuex'
 
 export default {
   directives: {
@@ -125,7 +127,12 @@ export default {
     this.scrollBoxHeight =
       document.documentElement.clientHeight - 46 - 44 - 54 + 'px'
   },
-  computed: {},
+  computed: {
+    ...mapState(['conversationsList']),
+    addOrDel () {
+      return this.conversationsList.filter(v => v.id === this.currGroup._id).length
+    }
+  },
   watch: {},
   methods: {
     onScrollBottom () {
@@ -166,6 +173,9 @@ export default {
       if (value === 'addFriend') {
         this.$router.push('/addfriend')
       }
+    },
+    goToConversation (value) {
+      this.$router.push('/conversation')
     }
 
   }
@@ -174,6 +184,7 @@ export default {
 <style lang="scss" scoped>
 .scroll {
   background-color: #f7f7fa;
+
 }
 .panel_container {
   display: flex;

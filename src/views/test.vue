@@ -1,3 +1,25 @@
+ // "scripts": {
+  //   "serve": "vue-cli-service serve",
+  //   "build": "vue-cli-service build",
+  //   "lint": "vue-cli-service lint"
+  // },
+
+  import VueSocketio from 'vue-socket.io'
+import Socketio from 'socket.io-client'
+import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
+
+// Vue.use(new VueSocketio, socketio(process.env.SOCKETIO))
+// Vue.use(VueSocketio, 'http://localhost:8899')
+Vue.use(new VueSocketio({
+  debug: true,
+  connection: Socketio('http://localhost:8080', {}), // options object is Optional
+  vuex: {
+    store,
+    actionPrefix: 'SOCKET_',
+    mutationPrefix: 'SOCKET_'
+  }
+})
+)
 <template>
 <div class="test_container">
 

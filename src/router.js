@@ -6,6 +6,8 @@ const Layout = r =>
 const Home = r => require.ensure([], () => r(require('@/views/Home/Home')), 'Home')
 
 const AddFriend = r => require.ensure([], () => r(require('@/views/Home/AddFriend')), 'AddFriend')
+const FriendDetail = r => require.ensure([], () => r(require('@/views/Home/FriendDetail')), 'FriendDetail')
+const FriendRequest = r => require.ensure([], () => r(require('@/views/Home/FriendRequest')), 'FriendRequest')
 const Conversation = r => require.ensure([], () => r(require('@/views/Home/Conversation')), 'Conversation')
 
 const Contact = r => require.ensure([], () => r(require('@/views/Contact/Contact')), 'Contact')
@@ -24,7 +26,7 @@ export default new Router({
       path: '/',
       name: 'layout',
       component: Layout,
-      redirect: { path: '/home' },
+      redirect: { path: '/register' },
       children: [
         {
           path: '/home',
@@ -37,6 +39,17 @@ export default new Router({
           name: 'addfriend',
 
           component: AddFriend
+        },
+        {
+          path: '/frienddetail',
+          name: 'frienddetail',
+
+          component: FriendDetail
+        },
+        {
+          path: '/friendrequest',
+          name: 'friendrequest',
+          component: FriendRequest
         },
         {
           path: '/conversation',
