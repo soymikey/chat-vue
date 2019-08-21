@@ -2,22 +2,35 @@
   <div class="explore_container">
     <x-header>{{this.$route.params.name}}</x-header>
 
-    <scroller lock-x :height="scrollBoxHeight" ref="scrollerBottom" :scroll-bottom-offst="250">
-      <div >
+    <scroller
+      lock-x
+      :height="scrollBoxHeight"
+      ref="scrollerBottom"
+      :scroll-bottom-offst="250"
+    >
+      <div>
+
         <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
-          <div v-if="item.type==='mine'" class="mine_container">
-            <div class="mine_content">
-              {{item.mes}}
-              <span class="my_spike"></span>
-            </div>
-            <img class="img" :src="IMG_URL+item.avatar" />
+          <div class="other_avatar_container">
+            <img
+              width="35"
+              height="35"
+              :src="IMG_URL+item.avatar"
+              v-show="item.type!=='mine'"
+            />
           </div>
-          <div v-else class="other_container">
-            <img class="img" :src="IMG_URL+item.avatar" />
-            <div class="other_content">
-              {{item.mes}}
-              <span class="other_spike"></span>
-            </div>
+
+          <p :class="item.type==='mine'?'my_message_box':'other_message_box'">
+            {{item.mes}}
+            <span :class="item.type==='mine'?'my_spike':'other_spike'"></span>
+          </p>
+          <div class="my_avartar-container">
+            <img
+              width="35"
+              height="35"
+              :src="IMG_URL+item.avatar"
+              v-show="item.type==='mine'"
+            />
           </div>
         </div>
         <div style="height:30px"></div>
@@ -25,7 +38,8 @@
     </scroller>
 
     <group style="position:absolute;bottom:0;width:100%;">
-      <x-input name="mobile" placeholder="请输入消息" v-model="message">
+
+      <x-input name="mobile" placeholder="请输入消息" style="width:100%;" v-model="message">
         <i
           slot="label"
           style="padding-right:10px;display:block;"
@@ -34,9 +48,8 @@
           class="iconfont icon-message"
         ></i>
 
-          <x-button slot="right" @click.native="send" mini type="primary">发送</x-button>
       </x-input>
-
+<x-button   @click.native="send" mini type="primary">发送</x-button>
     </group>
   </div>
 </template>
@@ -55,11 +68,7 @@ export default {
       other: require('../../assets/other.jpg'),
 
       // type 0 共有 1 群聊 2 好友
-      navList: [
-        { name: '聊天', type: 'group,friend', id: 0 },
-        { name: '公告', type: 'group', id: 1 },
-        { name: '聊天记录', type: 'group,friend', id: 2 }
-      ],
+      navList: [{ name: '聊天', type: 'group,friend', id: 0 }, { name: '公告', type: 'group', id: 1 }, { name: '聊天记录', type: 'group,friend', id: 2 }],
       IMG_URL: imgUrl,
       currNav: 0,
       spread: false,
@@ -69,8 +78,7 @@ export default {
         f: false
       },
       groupUsers: [], // 群成员
-      uplaodVisible: {
-        // 上传
+      uplaodVisible: { // 上传
         f: false
       },
       photoSwipeFlag: false, // 图片放大器
@@ -90,20 +98,17 @@ export default {
       }
     },
     mes (r) {
+      console.log('r', r)
       if (r.roomid === this.$route.params.id) {
         this.chatList.push(Object.assign({}, r, { type: 'other' }))
-        this.$socket.emit('setReadStatus', {
-          roomid: r.roomid,
-          name: this.user.name
-        })
+        this.$socket.emit('setReadStatus', { roomid: r.roomid, name: this.user.name })
         this.$store.commit('setUnRead', { roomid: r.roomid, clear: true })
-        // this.$nextTick(() => {
-        //   this.$refs.scrollerBottom.reset({ top: '100%' })
-        // })
+        this.$nextTick(() => {
+          this.$refs.scrollerBottom.reset({ bottom: 0 })
+        })
       }
     },
-    getHistoryMessages (r) {
-      // 获取历史消息
+    getHistoryMessages (r) { // 获取历史消息
       if (r.length) {
         this.$emit('NewMes', r[r.length - 1])
       }
@@ -125,15 +130,6 @@ export default {
   mounted () {
     this.scrollBoxHeight =
       document.documentElement.clientHeight - 46 - 46 + 'px'
-    //   // xs-container
-    // const declaration = document.getElementsByClassName('xs-container')[0].style
-    // // const declaration = this.$refs.scrollerBottom.$el.getElementsByClassName('xs-container')[0].style
-    // const height = declaration.getPropertyValue('cssText')
-    // console.log('this.$refs.scrollerBottom', height)
-
-    // this.$nextTick(() => {
-    //   this.$refs.scrollerBottom.reset({ bottom: 20 })
-    // })
     const v = this.$route.params
 
     if (!v.id) {
@@ -147,23 +143,17 @@ export default {
       if (v.type === 'group') {
         this.getGroupUsers(v.id)
       }
-      this.$socket.emit('setReadStatus', {
-        roomid: v.id,
-        name: this.user.name
-      })
+      this.$socket.emit('setReadStatus', { roomid: v.id, name: this.user.name })
       this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-      this.$socket.emit('getHistoryMessages', {
-        roomid: v.id,
-        offset: 1,
-        limit: 100
-      })
+      this.$socket.emit('getHistoryMessages', { roomid: v.id, offset: 1, limit: 100 })
     }
   },
   computed: {
     ...mapState(['user', 'OnlineUser'])
   },
   watch: {
-    $route (to, from) {
+
+    '$route' (to, from) {
       if (to.name === 'conversation') {
         const v = this.$route.params
 
@@ -178,16 +168,9 @@ export default {
           if (v.type === 'group') {
             this.getGroupUsers(v.id)
           }
-          this.$socket.emit('setReadStatus', {
-            roomid: v.id,
-            name: this.user.name
-          })
+          this.$socket.emit('setReadStatus', { roomid: v.id, name: this.user.name })
           this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-          this.$socket.emit('getHistoryMessages', {
-            roomid: v.id,
-            offset: 1,
-            limit: 100
-          })
+          this.$socket.emit('getHistoryMessages', { roomid: v.id, offset: 1, limit: 100 })
         }
       }
     },
@@ -229,8 +212,7 @@ export default {
     }
   },
   methods: {
-    send (params, type = 'mess') {
-      // 发送消息
+    send (params, type = 'mess') { // 发送消息
       if (!this.message && !params) {
         return
       }
@@ -245,8 +227,7 @@ export default {
         style: 'mess',
         userM: this.user.id
       }
-      if (type === 'emoji') {
-        // 发送表情
+      if (type === 'emoji') { // 发送表情
         val.style = 'emoji'
         val.mes = '表情'
         val.emoji = params
@@ -261,21 +242,17 @@ export default {
       }
       this.chatList.push(Object.assign({}, val, { type: 'mine' }))
       this.$socket.emit('mes', val)
-
       this.$emit('NewMes', val)
-      if (type === 'mess') {
-        // 发送文字
+      if (type === 'mess') { // 发送文字
         this.message = ''
       }
     },
 
-    lookPhoto (url) {
-      // 查看原图
+    lookPhoto (url) { // 查看原图
       this.photoSwipeUrl = url
       this.photoSwipeFlag = true
     },
-    uploadFileSuccess (res, file) {
-      // 上传成功
+    uploadFileSuccess (res, file) { // 上传成功
       if (file.raw.type.indexOf('image') > -1) {
         this.send(res.data, 'img')
       } else {
@@ -283,8 +260,7 @@ export default {
       }
       this.uplaodVisible.f = false
     },
-    InmageChange () {
-      // 发送图片
+    InmageChange () { // 发送图片
       let f = this.$refs['chooseInmage'].files[0]
       if (f.type.indexOf('image') === -1) {
         this.$message.error('只能上传图片!')
@@ -309,8 +285,7 @@ export default {
       })
       this.$refs['chooseInmage'].value = ''
     },
-    getGroupUserStatus (obj) {
-      // 群成员在线状态
+    getGroupUserStatus (obj) { // 群成员在线状态
       this.groupUsers.forEach((v, i) => {
         let flag = false
         Object.keys(obj).forEach(k => {
@@ -336,14 +311,11 @@ export default {
       this.offset += 1
       setTimeout(v => {
         let page = (this.offset - 1) * this.limit
-        this.groupUserList = this.groupUserList.concat(
-          this.groupUsers.slice(page, page + this.limit)
-        )
+        this.groupUserList = this.groupUserList.concat(this.groupUsers.slice(page, page + this.limit))
         this.loadmoreLoading = false
       }, 1000)
     },
-    getGroupUsers (id) {
-      // 获取群成员
+    getGroupUsers (id) { // 获取群成员
       let params = {
         groupId: id
       }
@@ -357,7 +329,41 @@ export default {
         }
       })
     },
-
+    send (params, type = 'mess') { // 发送消息
+      if (!this.message && !params) {
+        return
+      }
+      let val = {
+        name: this.user.name,
+        mes: this.message,
+        time: formatTime(new Date()),
+        avatar: this.user.photo,
+        nickname: this.user.nickname,
+        read: [this.user.name],
+        roomid: this.$route.params.id,
+        style: 'mess',
+        userM: this.user.id
+      }
+      if (type === 'emoji') { // 发送表情
+        val.style = 'emoji'
+        val.mes = '表情'
+        val.emoji = params
+      } else if (type === 'img') {
+        val.style = 'img'
+        val.mes = '图片'
+        val.emoji = params
+      } else if (type === 'file') {
+        val.style = 'file'
+        val.mes = params.name
+        val.emoji = params.response.data
+      }
+      this.chatList.push(Object.assign({}, val, { type: 'mine' }))
+      this.$socket.emit('mes', val)
+      this.$emit('NewMes', val)
+      if (type === 'mess') { // 发送文字
+        this.message = ''
+      }
+    },
     chooseEmojiDefault (em) {
       this.message += em
       this.showEmoji.f = false
@@ -366,8 +372,7 @@ export default {
       this.send(url, 'emoji')
       this.showEmoji.f = false
     },
-    clear () {
-      // 清空
+    clear () { // 清空
       this.message = ''
     }
   }
@@ -379,68 +384,62 @@ export default {
 }
 
 .coversation_box-container {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
   margin-top: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
-  .mine_container {
-    width: 100%;
+  .other_avatar_container {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    .mine_content {
-      background-color: #5fc9f8;
-      padding: 10px;
-      border-radius: 3%;
-      word-break: break-all;
-      margin-right: 10px;
-      max-width: 60%;
-      position: relative;
-      .my_spike {
-        background: #5fc9f8;
-        height: 8px;
-        width: 8px;
-        position: absolute;
-        right: -5px;
-        top: 4px;
-        transform: translate(-50%, -50%);
-        transform: rotate(45deg);
-      }
-    }
-    .img {
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-    }
+    flex: 1;
+    padding-left: 10px;
+    padding-right: 10px;
   }
-  .other_container {
-    width: 100%;
+  .my_avartar-container {
     display: flex;
-    justify-content: flex;
     align-items: center;
-    .other_content {
-      background-color: pink;
-      padding: 10px;
-      border-radius: 3%;
-      word-break: break-all;
-      margin-left: 10px;
-      max-width: 60%;
-      position: relative;
-      .other_spike {
-        background: pink;
-        height: 8px;
-        width: 8px;
-        position: absolute;
-        left: -5px;
-        top: 4px;
-        transform: translate(-50%, -50%);
-        transform: rotate(45deg);
-      }
-    }
-    .img {
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-    }
+    flex: 1;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .other_message_box {
+    flex: 8;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 3%;
+    position: relative;
+    word-break: break-all;
+  }
+  .my_message_box {
+    flex: 8;
+    background-color: #5fc9f8;
+    padding: 10px;
+    border-radius: 3%;
+    position: relative;
+    word-break: break-all;
+  }
+  .my_spike {
+    background: #5fc9f8;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    right: -3px;
+    top: 4px;
+
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);
+  }
+  .other_spike {
+    background: #fff;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+    right: -3px;
+    top: 4px;
+
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);
   }
 }
+
 </style>

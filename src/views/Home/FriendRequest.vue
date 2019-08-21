@@ -42,7 +42,7 @@ export default {
   watch: {},
   methods: {
     onConfirm () {
-      this.$router.push({ name: 'addfriend' })
+      this.$router.go(-1)
     },
     send () {
       let friend = JSON.parse(localStorage.friend)

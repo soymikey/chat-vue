@@ -47,7 +47,7 @@ export default {
     this.checkMyfriends()
   },
   watch: {
-    '$route.params.id' () {
+    '$route' (to, from) {
       this.getUserInfo()
       this.checkMyfriends()
     }

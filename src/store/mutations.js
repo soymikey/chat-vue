@@ -52,5 +52,11 @@ export default {
     } else {
       state.unRead.push({ roomid: data.roomid, count: data.count })
     }
+  },
+  setNewMes (state, data) {
+    console.log('data'.data)
+    
+    state.newMes = data
   }
+
 }

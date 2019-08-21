@@ -8,5 +8,8 @@ export default {
       count += v.count
     })
     return count
+  },
+  getNewMes (state) {
+    return state.newMes
   }
 }

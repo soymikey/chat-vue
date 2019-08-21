@@ -1,8 +1,10 @@
 
 <template>
   <div class="layout">
-
-    <!-- {{unReadCount}} -->
+user:{{user.nickname}}
+ OnlineUser:{{OnlineUser}}
+    <!-- unReadCount:{{unReadCount}}
+    -->
     <keep-alive>
       <router-view></router-view>
     </keep-alive>
@@ -12,7 +14,7 @@
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
-      <tabbar-item link="/home"  else>
+      <tabbar-item link="/home" v-else>
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
@@ -54,6 +56,8 @@ export default {
       this.$store.commit('setOnlineUser', OnlineUser)
     },
     getHistoryMessages (mesdata) { // 获取未读消息数量
+      console.log('mesdata', mesdata)
+
       let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1)
       if (data.length) {
         this.$store.commit('setUnRead', { roomid: data[0].roomid, count: data.length })
@@ -63,8 +67,6 @@ export default {
       this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
     },
     takeValidate (r) {
-      console.log('r', r)
-
       this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
       if (r.type === 'info') {
         this.$store.dispatch('getUserInfo')
@@ -72,7 +74,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['user', 'conversationsList', 'Vchat']),
+    ...mapState(['user', 'conversationsList', 'Vchat', 'OnlineUser']),
     ...mapGetters(['unReadCount']),
     isMainNav () {
       return ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1

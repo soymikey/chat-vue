@@ -41,7 +41,7 @@ export default new Router({
           component: AddFriend
         },
         {
-          path: '/frienddetail',
+          path: '/frienddetail/:id',
           name: 'frienddetail',
 
           component: FriendDetail
@@ -52,7 +52,7 @@ export default new Router({
           component: FriendRequest
         },
         {
-          path: '/conversation',
+          path: '/conversation/:id',
           name: 'conversation',
 
           component: Conversation

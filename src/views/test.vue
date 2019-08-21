@@ -66,3 +66,61 @@ export default {
 </script>
 <style lang="scss">
 </style>
+
+<scroller lock-x :height="scrollBoxHeight" ref="scrollerBottom" :scroll-bottom-offst="250">
+      <div>
+        <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
+
+          <div
+            v-if="item.type==='mine'"
+            style="width:100%;
+            display:flex;
+            justify-content:flex-end;
+            align-items:center;"
+          >
+            <div
+              style="background-color: #5fc9f8;
+            padding: 10px;
+    border-radius: 3%;
+    word-break: break-all;
+     margin-right:10px;
+     max-width:60%;
+     position:relative
+     "
+            >{{item.mes}} <spans style='background: #5fc9f8;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+right:-5px;
+top:4px;
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);'></spans> </div>
+            <img width="35" height="35" :src="IMG_URL+item.avatar" />
+          </div>
+          <div
+            v-else
+            style="width:100%;display:flex;justify-content:flex;align-items:center;"
+          >
+            <img width="35" height="35" :src="IMG_URL+item.avatar" />
+            <div
+              style="background-color: pink;
+            padding: 10px;
+    border-radius: 3%;
+    word-break: break-all;
+     margin-left:10px;
+     max-width:60%;
+     position:relative
+     "
+            >{{item.mes}} <spans style='background: pink;
+    height: 8px;
+    width: 8px;
+    position: absolute;
+left:-5px;
+top:4px;
+    transform: translate(-50%, -50%);
+    transform: rotate(45deg);'></spans></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </scroller>
