@@ -4,13 +4,14 @@
 //  routerMode: 路由模式
 //  imgBaseUrl: 图片所在域名地址
 
-let baseUrl = '/'
+let baseUrl = 'http://192.168.1.120/'
+let serverUrl = 'http://192.168.1.120:9988'
 let routerMode = 'hash'
 let imgUrl = ''
-let socketIo = 'http://localhost:9988'
+let socketIo = 'http://192.168.1.120:9988/'
 
 if (process.env.NODE_ENV === 'development') {
-  imgUrl = 'http://localhost:9988/'
+  imgUrl = 'http://192.168.1.120:9988/'
 } else if (process.env.NODE_ENV === 'production') {
 
 }
@@ -21,4 +22,4 @@ if (process.env.NODE_ENV === 'development') {
 //   imgBaseUrl = '//elm.cangdu.org/img/'
 // }
 
-export { baseUrl, routerMode, imgUrl, socketIo }
+export { baseUrl, routerMode, imgUrl, socketIo, serverUrl }

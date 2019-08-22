@@ -2,14 +2,15 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-
+import { socketIo } from '../config/env'
 // import 'normalize.css'
 import 'vux/src/styles/reset.less'
 import VueSocketio from 'vue-socket.io'
 import socketio from 'socket.io-client'
 import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
+console.log('socketIo', socketIo)
 
-Vue.use(VueSocketio, socketio('http://localhost:9988/'))
+Vue.use(VueSocketio, socketio(socketIo))
 
 Vue.component('x-button', XButton)
 Vue.component('tabbar', Tabbar)

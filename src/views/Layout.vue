@@ -18,7 +18,11 @@ user:{{user.nickname}}
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
-      <tabbar-item  link="/contact">
+      <tabbar-item  link="/contact" :badge='getRequestList.length.toString()' v-if='getRequestList.length'>
+        <i slot="icon" class="iconfont icon-contact"></i>
+        <span slot="label">通讯录</span>
+      </tabbar-item>
+      <tabbar-item  link="/contact" v-else>
         <i slot="icon" class="iconfont icon-contact"></i>
         <span slot="label">通讯录</span>
       </tabbar-item>
@@ -56,26 +60,31 @@ export default {
       this.$store.commit('setOnlineUser', OnlineUser)
     },
     getHistoryMessages (mesdata) { // 获取未读消息数量
-      console.log('mesdata', mesdata)
-
       let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1)
+      let reqeustData = mesdata.filter(v => v.type === 'validate')
+
       if (data.length) {
         this.$store.commit('setUnRead', { roomid: data[0].roomid, count: data.length })
+      }
+      if (reqeustData.length) {
+        this.$store.commit('setRequest', reqeustData)
       }
     },
     mes (r) { // 更改未读消息数量
       this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
     },
     takeValidate (r) {
-      this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
+      console.log('r', r)
+
+      this.$store.commit('setRequest', r)
       if (r.type === 'info') {
         this.$store.dispatch('getUserInfo')
       }
     }
   },
   computed: {
-    ...mapState(['user', 'conversationsList', 'Vchat', 'OnlineUser']),
-    ...mapGetters(['unReadCount']),
+    ...mapState(['user', 'conversationsList', 'OnlineUser']),
+    ...mapGetters(['unReadCount', 'getRequestList']),
     isMainNav () {
       return ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1
     }

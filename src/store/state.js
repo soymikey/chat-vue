@@ -8,5 +8,6 @@ export default {
   OnlineUser: {}, // 在线人数
   unRead: [], // 未读消息
   Vchat: {}, // 官方账号信息
-  newMes: {}// 最新的消息
+  newMes: {}, // 最新的消息
+  requestList: [] // 请求消息
 }

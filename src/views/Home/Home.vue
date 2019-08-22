@@ -42,7 +42,7 @@
 
 <script>
 import { TransferDom } from 'vux'
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import api from '@/api'
 import { imgUrl } from '../../../config/env'
 export default {

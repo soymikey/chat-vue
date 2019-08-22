@@ -11,6 +11,8 @@ const FriendRequest = r => require.ensure([], () => r(require('@/views/Home/Frie
 const Conversation = r => require.ensure([], () => r(require('@/views/Home/Conversation')), 'Conversation')
 
 const Contact = r => require.ensure([], () => r(require('@/views/Contact/Contact')), 'Contact')
+const FriendVerify = r => require.ensure([], () => r(require('@/views/Contact/FriendVerify')), 'FriendVerify')
+
 const Explore = r => require.ensure([], () => r(require('@/views/Explore/Explore')), 'Explore')
 const User = r => require.ensure([], () => r(require('@/views/User/User')), 'User')
 const Login = r => require.ensure([], () => r(require('@/views/Login')), 'Login')
@@ -61,6 +63,11 @@ export default new Router({
           path: '/contact',
           name: 'contact',
           component: Contact
+        },
+        {
+          path: '/friendverify',
+          name: 'friendverify',
+          component: FriendVerify
         },
         {
           path: '/explore',
