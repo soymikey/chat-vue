@@ -32,7 +32,7 @@
 
 <script>
 import api from '@/api'
-import { imgUrl } from '../../../config/env'
+import env from '../../../config/env'
 
 export default {
   data () {
@@ -41,7 +41,7 @@ export default {
       friendList: [],
       huntKey: '', // 搜索参数
       loadingSearch: false, // 加载动画
-      IMG_URL: imgUrl,
+      IMG_URL: env.imgUrl,
       searchOptions: [
         {
           value: '2',

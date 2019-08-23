@@ -22,4 +22,7 @@ if (process.env.NODE_ENV === 'development') {
 //   imgBaseUrl = '//elm.cangdu.org/img/'
 // }
 
-export { baseUrl, routerMode, imgUrl, socketIo, serverUrl }
+export default {
+  baseUrl, routerMode, imgUrl, socketIo, serverUrl
+}
+// export { baseUrl, routerMode, imgUrl, socketIo, serverUrl }

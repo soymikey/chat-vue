@@ -44,14 +44,14 @@
 import { TransferDom } from 'vux'
 import { mapState } from 'vuex'
 import api from '@/api'
-import { imgUrl } from '../../../config/env'
+import env from '../../../config/env'
 export default {
   directives: {
     TransferDom
   },
   data () {
     return {
-      IMG_URL: imgUrl,
+      IMG_URL: env.imgUrl,
       onFetching: false,
       scrollBoxHeight: '',
       showMenus: false,
@@ -83,6 +83,15 @@ export default {
       // ]
     }
   },
+  sockets: {
+    getHistoryMessages (r) {
+
+      // this.contactsList = this.contactsList.map(c => {
+      //   c.newMes = r[r.length - 1].mes
+      //   return c
+      // })
+    }
+  },
   created () {},
   mounted () {
     this.scrollBoxHeight =
@@ -103,7 +112,6 @@ export default {
 
       handler (list) {
         this.contactsList = JSON.parse(JSON.stringify(list))
-        console.log('contactsList', this.contactsList)
 
         if (!this.currSation.id && list.length) {
           this.currSation = this.contactsList[0]
@@ -133,7 +141,7 @@ export default {
         this.contactsList.forEach((v, i) => {
           list.forEach(m => {
             if (v.id === m.roomid) {
-              this.$set(this.contactsList, i, Object.assign({}, v, { unRead: m.count }))
+              this.$set(this.contactsList, i, Object.assign({}, v, { unRead: m.count, newMes: m.newMes }))
             }
           })
         })

@@ -27,13 +27,13 @@
 </template>
 
 <script>
-import { imgUrl } from '../../../config/env'
+import env from '../../../config/env'
 import api from '@/api'
 import { mapState } from 'vuex'
 export default {
   data () {
     return {
-      IMG_URL: imgUrl,
+      IMG_URL: env.imgUrl,
       friendInfo: { cover: [], province: {}, city: {}, town: {} }, // user详情
       showFriendQr: false, // 二维码开关
       myFriendFlag: false // 是否为我的好友

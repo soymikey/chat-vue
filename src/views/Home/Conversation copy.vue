@@ -57,7 +57,7 @@
 <script>
 import { mapState } from 'vuex'
 
-import { imgUrl } from '../../../config/env'
+import env from '../../../config/env'
 import api from '@/api'
 import { formatTime } from '@/utils/utils'
 export default {
@@ -69,7 +69,7 @@ export default {
 
       // type 0 共有 1 群聊 2 好友
       navList: [{ name: '聊天', type: 'group,friend', id: 0 }, { name: '公告', type: 'group', id: 1 }, { name: '聊天记录', type: 'group,friend', id: 2 }],
-      IMG_URL: imgUrl,
+      IMG_URL: env.imgUrl,
       currNav: 0,
       spread: false,
       chatList: [],

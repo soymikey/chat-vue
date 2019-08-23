@@ -61,6 +61,7 @@ export default {
     },
     getHistoryMessages (mesdata) { // 获取未读消息数量
       let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1)
+
       let reqeustData = mesdata.filter(v => v.type === 'validate')
 
       if (data.length) {
@@ -70,12 +71,11 @@ export default {
         this.$store.commit('setRequest', reqeustData)
       }
     },
+
     mes (r) { // 更改未读消息数量
       this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
     },
     takeValidate (r) {
-      console.log('r', r)
-
       this.$store.commit('setRequest', r)
       if (r.type === 'info') {
         this.$store.dispatch('getUserInfo')
@@ -111,6 +111,7 @@ export default {
           roomid: v.id
         }
         let room = { roomid: v.id, offset: 1, limit: 200 }
+
         this.$socket.emit('join', val)
         this.$socket.emit('getHistoryMessages', room)
       })

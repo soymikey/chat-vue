@@ -37,12 +37,12 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { imgUrl } from '../../../config/env'
+import env from '../../../config/env'
 
 export default {
   data () {
     return {
-      IMG_URL: imgUrl,
+      IMG_URL: env.imgUrl,
 
       scrollBoxHeight: '',
 
