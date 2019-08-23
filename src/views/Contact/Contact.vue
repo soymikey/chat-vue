@@ -10,7 +10,19 @@
       :scroll-bottom-offst="200"
     >
       <div>
+        <div v-for="(item,index) in unReadRequest" :key="index" @click="goToFRiendVerify(item)">
 
+            <div slot="body" class="panel_container">
+              <div class="avartar_container">
+                <img width="100%" :src="IMG_URL+item.avatar" />
+                <!-- <badge v-if="item.unRead !== 0" class="badge" :text='item.unRead' :max="99" ></badge> -->
+              </div>
+              <div class="body">
+                <div class="title">{{item.name}}</div>
+              </div>
+            </div>
+          </panel>
+        </div>
         <group>
           <cell is-link :title="item.name+index" v-for="(item,index) in list" :key="index">
             <img slot="icon" width="35" style="display:block;margin-right:15px; " :src="item.icon" />
@@ -23,10 +35,10 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import env from '../../../config/env'
 
 export default {
+  props: ['unReadRequest'],
   data () {
     return {
       IMG_URL: env.imgUrl,
@@ -40,33 +52,8 @@ export default {
         { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
         { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
         { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/emoji.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/collection.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/album.png') },
-        { name: '新的朋友', icon: require('../../assets/userpng/card_bag.png') } ]
-
+        { name: '新的朋友', icon: require('../../assets/userpng/album.png') }
+      ]
     }
   },
   created () {},

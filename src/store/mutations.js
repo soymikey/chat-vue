@@ -29,6 +29,17 @@ export default {
   setOnlineUser (state, data) {
     state.OnlineUser = data
   },
+  setUnReadRequest (state, data) {
+    if (typeof (data) === 'object') {
+      state.unReadRequest.push(data)
+    } else if (data.length) {
+      state.unReadRequest = data
+    } else {
+      console.log('i am here')
+
+      state.unReadRequest = []
+    }
+  },
   setUnRead (state, data) {
     if (data.clear) {
       state.unRead.forEach(v => {

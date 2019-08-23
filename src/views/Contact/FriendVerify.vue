@@ -23,11 +23,17 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 
 import env from '../../../config/env'
 
 export default {
+  props: ['unReadRequest'],
+  sockets: {
+    ValidateSuccess () {
+      this.$store.dispatch('getUserInfo', this)
+    }
+  },
   data () {
     return {
       IMG_URL: env.imgUrl,
@@ -47,12 +53,21 @@ export default {
 
   },
   watch: {
-    '$route' (to, from) {
-      this.friendInfo = this.$route.params
-    }
+
   },
   methods: {
     onScrollBottom () {
+    },
+    agree (v) {
+      v.userYphoto = this.user.photo
+      v.userYname = this.user.nickname
+
+      this.$socket.emit('agreeValidate', v)
+
+      const newRequestUnRead = this.unReadRequest.filter(m => m.name !== v.name)
+      console.log('newRequestUnRead', newRequestUnRead)
+
+      this.$store.commit('setUnReadRequest', newRequestUnRead)
     }
 
   }

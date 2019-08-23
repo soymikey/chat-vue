@@ -3,6 +3,7 @@
     <x-header>{{this.$route.params.name}}</x-header>
 
     <scroller lock-x :height="scrollBoxHeight" ref="scrollerBottom" :scroll-bottom-offst="250">
+
       <div >
         <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
           <div v-if="item.type==='mine'" class="mine_container">

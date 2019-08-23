@@ -16,13 +16,14 @@
       :scroll-bottom-offst="200"
       @on-pulldown-loading="refresh"
     >
+
       <div>
         <div v-for="(item,index) in contactsList" :key="index" @click="goToConversation(item)">
-          <panel >
+          <panel>
             <div slot="body" class="panel_container">
               <div class="avartar_container">
                 <img width="100%" :src="IMG_URL+item.photo" />
-                <badge v-if="item.unRead !== 0" class="badge" :text='item.unRead' :max="99" ></badge>
+                <badge v-if="item.unRead !== 0" class="badge" :text="item.unRead" :max="99"></badge>
               </div>
               <div class="body">
                 <div class="title">{{item.name}}</div>
@@ -68,11 +69,11 @@ export default {
       currSation: {}, // 当前会话
       contactsList: [], // 会话列表
       IMGURL: process.env.IMG_URL,
-      settingFlag: { // 设置面板
+      settingFlag: {
+        // 设置面板
         f: false
       },
       removeSation: {}
-
     }
   },
 
@@ -84,11 +85,12 @@ export default {
 
   computed: {
     ...mapState(['user', 'conversationsList', 'Vchat', 'unRead'])
-
   },
   watch: {
     conversationsList: {
       handler (list) {
+        console.log('conversationsList')
+        
         this.contactsList = JSON.parse(JSON.stringify(list))
         if (!this.currSation.id && list.length) {
           this.currSation = this.contactsList[0]
@@ -97,8 +99,14 @@ export default {
           this.currSation = {}
         }
         if (!isNaN(this.removeSation.index)) {
-          if (this.currSation.id === this.removeSation.item.id && this.contactsList.length !== 0) {
-            this.currSation = this.contactsList[this.removeSation.index] || this.contactsList[this.removeSation.index - 1] || this.contactsList[this.removeSation.index + 1]
+          if (
+            this.currSation.id === this.removeSation.item.id &&
+            this.contactsList.length !== 0
+          ) {
+            this.currSation =
+              this.contactsList[this.removeSation.index] ||
+              this.contactsList[this.removeSation.index - 1] ||
+              this.contactsList[this.removeSation.index + 1]
           }
         }
       },
@@ -118,7 +126,11 @@ export default {
         this.contactsList.forEach((v, i) => {
           list.forEach(m => {
             if (v.id === m.roomid) {
-              this.$set(this.contactsList, i, Object.assign({}, v, { unRead: m.count }))
+              this.$set(
+                this.contactsList,
+                i,
+                Object.assign({}, v, { unRead: m.count })
+              )
             }
           })
         })
@@ -133,9 +145,7 @@ export default {
     }
   },
   methods: {
-    onScrollBottom () {
-
-    },
+    onScrollBottom () {},
     refresh () {
       console.log('refresh')
     },
@@ -145,7 +155,7 @@ export default {
       }
     },
     goToConversation (value) {
-      this.$emit('setConversationCurrSation', this.currSation)
+      this.$emit('setConversationCurrSation', value)
       this.$router.push({ name: 'conversation' })
     },
     // --------------------------------------
@@ -157,10 +167,14 @@ export default {
     },
 
     remove (v, i) {
-      if (v.type === 'vchat') { // 只做显示列表移除
+      if (v.type === 'vchat') {
+        // 只做显示列表移除
         this.contactsList = this.contactsList.filter(m => m.id !== v.id)
         if (this.currSation.id === v.id && this.contactsList.length !== 0) {
-          this.currSation = this.contactsList[i] || this.contactsList[i - 1] || this.contactsList[i + 1]
+          this.currSation =
+            this.contactsList[i] ||
+            this.contactsList[i - 1] ||
+            this.contactsList[i + 1]
         }
       } else {
         api.removeConversitionList(v).then(r => {
@@ -169,7 +183,10 @@ export default {
               type: 'success',
               message: '移除成功'
             })
-            this.$store.commit('setConversationsList', Object.assign({ d: true }, v))
+            this.$store.commit(
+              'setConversationsList',
+              Object.assign({ d: true }, v)
+            )
             //                            this.contactsList = this.contactsList.filter(m => m.id !== v.id);
             this.removeSation = {
               item: v,
@@ -184,27 +201,32 @@ export default {
         })
       }
     },
-    getNewMes (m) { // 获取最新一条消息
+    getNewMes (m) {
+      // 获取最新一条消息
       this.contactsList.forEach((v, i) => {
         if (v.id === m.roomid) {
-          this.$set(this.contactsList, i, Object.assign({}, v, { newMes: m.mes, newMesTime: m.time.split(' ')[1] }))
+          this.$set(
+            this.contactsList,
+            i,
+            Object.assign({}, v, {
+              newMes: m.mes,
+              newMesTime: m.time.split(' ')[1]
+            })
+          )
         }
       })
     }
-
   }
 }
 </script>
 <style lang="scss" scoped>
 .scroll {
   background-color: #f7f7fa;
-
 }
 .panel_container {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
-  position: relative;
   .avartar_container {
     width: 15%;
     padding: 10px;
@@ -218,27 +240,33 @@ export default {
   }
   .body {
     padding: 10px;
-    width: 85%;
+    width: 60%;
     .title {
       font-weight: 400;
       font-size: 17px;
-      width: auto;
+
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      word-wrap: normal;
-      word-wrap: break-word;
-      word-break: break-all;
     }
     .content {
+
       color: #999999;
-      font-size: 13px;
+      font-size: 17px;
       line-height: 1.2;
       overflow: hidden;
       text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      white-space: nowrap;
+      // width: 70%;
+      // color: #999999;
+      // font-size: 13px;
+      // line-height: 1.2;
+      //   width: auto;
+      // overflow: hidden;
+      // text-overflow: ellipsis;
+      // white-space: nowrap;
+      // word-wrap: break-word;
+      // word-break: break-all;
     }
   }
 }
