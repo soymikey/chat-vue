@@ -1,12 +1,15 @@
 
 <template>
   <div class="layout">
-user:{{user.nickname}}
  OnlineUser:{{OnlineUser}}
     <!-- unReadCount:{{unReadCount}}
     -->
     <keep-alive>
-      <router-view></router-view>
+      <router-view :currSation='conversationCurrSation'
+      @setConversationCurrSation="setConversationCurrSation"
+      @NewMes='getNewMes'
+       :latestMes='homeLatestMes'
+      ></router-view>
     </keep-alive>
 
     <tabbar v-show='isMainNav'>
@@ -18,11 +21,8 @@ user:{{user.nickname}}
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
-      <tabbar-item  link="/contact" :badge='getRequestList.length.toString()' v-if='getRequestList.length'>
-        <i slot="icon" class="iconfont icon-contact"></i>
-        <span slot="label">通讯录</span>
-      </tabbar-item>
-      <tabbar-item  link="/contact" v-else>
+
+      <tabbar-item  link="/contact" >
         <i slot="icon" class="iconfont icon-contact"></i>
         <span slot="label">通讯录</span>
       </tabbar-item>
@@ -43,6 +43,12 @@ user:{{user.nickname}}
 import { mapState, mapGetters } from 'vuex'
 import { formatTime } from '../utils/utils'
 export default {
+  data () {
+    return {
+      conversationCurrSation: {},
+      homeLatestMes: {}
+    }
+  },
   components: {},
   sockets: {
     connect: function (val) {
@@ -61,22 +67,17 @@ export default {
     },
     getHistoryMessages (mesdata) { // 获取未读消息数量
       let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1)
-
-      let reqeustData = mesdata.filter(v => v.type === 'validate')
-
       if (data.length) {
         this.$store.commit('setUnRead', { roomid: data[0].roomid, count: data.length })
       }
-      if (reqeustData.length) {
-        this.$store.commit('setRequest', reqeustData)
-      }
+      this.getNewMes(mesdata[mesdata.length - 1])
     },
-
     mes (r) { // 更改未读消息数量
       this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
+      this.getNewMes(r)
     },
     takeValidate (r) {
-      this.$store.commit('setRequest', r)
+      this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
       if (r.type === 'info') {
         this.$store.dispatch('getUserInfo')
       }
@@ -84,7 +85,7 @@ export default {
   },
   computed: {
     ...mapState(['user', 'conversationsList', 'OnlineUser']),
-    ...mapGetters(['unReadCount', 'getRequestList']),
+    ...mapGetters(['unReadCount', 'List']),
     isMainNav () {
       return ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1
     }
@@ -115,7 +116,14 @@ export default {
         this.$socket.emit('join', val)
         this.$socket.emit('getHistoryMessages', room)
       })
+    },
+    setConversationCurrSation (value) {
+      this.conversationCurrSation = value
+    },
+    getNewMes (value) {
+      this.homeLatestMes = value
     }
+
   }
 }
 </script>

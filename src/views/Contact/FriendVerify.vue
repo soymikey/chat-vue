@@ -43,8 +43,7 @@ export default {
     this.friendInfo = this.$route.params
   },
   computed: {
-    ...mapState(['user']),
-    ...mapGetters(['getRequestList'])
+    ...mapState(['user'])
 
   },
   watch: {
@@ -54,19 +53,8 @@ export default {
   },
   methods: {
     onScrollBottom () {
-    },
-    agree (v) {
-      v.userYphoto = this.user.photo
-      v.userYname = this.user.nickname
-      this.$socket.emit('agreeValidate', v)
-      this.getRequestList.forEach(m => { // 更新同一申请人的所有相同请求
-        if (m.userM === v.userM && m.type === 'validate' && (v.state === 'friend' || v.state === 'group')) {
-          m.status = '1'
-          m.visible = false
-        }
-      })
-      this.$router.push({ name: 'home' })
     }
+
   }
 }
 </script>

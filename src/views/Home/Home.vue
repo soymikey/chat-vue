@@ -22,7 +22,7 @@
             <div slot="body" class="panel_container">
               <div class="avartar_container">
                 <img width="100%" :src="IMG_URL+item.photo" />
-                <badge :v-if="item.unRead !== 0" class="badge" :text='item.unRead' :max="99" ></badge>
+                <badge v-if="item.unRead !== 0" class="badge" :text='item.unRead' :max="99" ></badge>
               </div>
               <div class="body">
                 <div class="title">{{item.name}}</div>
@@ -46,6 +46,7 @@ import { mapState } from 'vuex'
 import api from '@/api'
 import env from '../../../config/env'
 export default {
+  props: ['latestMes'],
   directives: {
     TransferDom
   },
@@ -66,53 +67,29 @@ export default {
       // ------------------
       currSation: {}, // 当前会话
       contactsList: [], // 会话列表
-      // IMGURL: process.env.IMG_URL,
+      IMGURL: process.env.IMG_URL,
       settingFlag: { // 设置面板
         f: false
       },
       removeSation: {}
-      // list: [
-      //   {
-      //     src: require('../../assets/me.jpg'),
-      //     fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-      //     title: '标题一',
-      //     desc:
-      //       '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-      //     url: '/conversation'
-      //   },
-      // ]
-    }
-  },
-  sockets: {
-    getHistoryMessages (r) {
 
-      // this.contactsList = this.contactsList.map(c => {
-      //   c.newMes = r[r.length - 1].mes
-      //   return c
-      // })
     }
   },
+
   created () {},
   mounted () {
     this.scrollBoxHeight =
       document.documentElement.clientHeight - 46 - 44 - 54 + 'px'
   },
-  // computed: {
-  //   ...mapState(['conversationsList']),
-  //   addOrDel () {
-  //     return this.conversationsList.filter(v => v.id === this.currGroup._id).length
-  //   }
-  // },
+
   computed: {
     ...mapState(['user', 'conversationsList', 'Vchat', 'unRead'])
 
   },
   watch: {
     conversationsList: {
-
       handler (list) {
         this.contactsList = JSON.parse(JSON.stringify(list))
-
         if (!this.currSation.id && list.length) {
           this.currSation = this.contactsList[0]
         }
@@ -141,60 +118,23 @@ export default {
         this.contactsList.forEach((v, i) => {
           list.forEach(m => {
             if (v.id === m.roomid) {
-              this.$set(this.contactsList, i, Object.assign({}, v, { unRead: m.count, newMes: m.newMes }))
+              this.$set(this.contactsList, i, Object.assign({}, v, { unRead: m.count }))
             }
           })
         })
       },
       deep: true,
       immediate: true
+    },
+    latestMes: {
+      handler (value) {
+        this.getNewMes(value)
+      }
     }
-    // getNewMes: {
-    //   handler (newMes) {
-    //     console.log('newMes', newMes)
-
-    //     this.contactsList.forEach((v, i) => {
-    //       if (v.id === newMes.roomid) {
-    //         this.$set(this.contactsList, i, Object.assign({}, v, { newMes: newMes.mes, newMesTime: newMes.time.split(' ')[1] }))
-    //       }
-    //     })
-    //   },
-    //   deep: true,
-    //   immediate: true
-
-    // }
   },
   methods: {
     onScrollBottom () {
-      // if (this.onFetching) {
-      //   // do nothing
-      // } else {
-      //   this.onFetching = true
-      //   setTimeout(() => {
-      //     this.list = this.list.concat([
-      //       {
-      //         src: require('../../assets/other.jpg'),
-      //         fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-      //         title: '标题一',
-      //         desc:
-      //           '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-      //         url: '/conversation'
-      //       },
-      //       {
-      //         src: require('../../assets/other.jpg'),
-      //         fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-      //         title: '标题一',
-      //         desc:
-      //           '由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。',
-      //         url: '/conversation'
-      //       }
-      //     ])
-      //     this.$nextTick(() => {
-      //       this.$refs.scrollerBottom.reset()
-      //     })
-      //     this.onFetching = false
-      //   }, 2000)
-      // }
+
     },
     refresh () {
       console.log('refresh')
@@ -205,7 +145,8 @@ export default {
       }
     },
     goToConversation (value) {
-      this.$router.push({ name: 'conversation', params: value })
+      this.$emit('setConversationCurrSation', this.currSation)
+      this.$router.push({ name: 'conversation' })
     },
     // --------------------------------------
     setCurrSation (v) {
@@ -214,13 +155,7 @@ export default {
       }
       this.currSation = v
     },
-    // getNewMes (m) { // 获取最新一条消息
-    //   this.contactsList.forEach((v, i) => {
-    //     if (v.id === m.roomid) {
-    //       this.$set(this.contactsList, i, Object.assign({}, v, { newMes: m.mes, newMesTime: m.time.split(' ')[1] }))
-    //     }
-    //   })
-    // },
+
     remove (v, i) {
       if (v.type === 'vchat') { // 只做显示列表移除
         this.contactsList = this.contactsList.filter(m => m.id !== v.id)
@@ -248,6 +183,13 @@ export default {
           }
         })
       }
+    },
+    getNewMes (m) { // 获取最新一条消息
+      this.contactsList.forEach((v, i) => {
+        if (v.id === m.roomid) {
+          this.$set(this.contactsList, i, Object.assign({}, v, { newMes: m.mes, newMesTime: m.time.split(' ')[1] }))
+        }
+      })
     }
 
   }

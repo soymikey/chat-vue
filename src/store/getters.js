@@ -8,12 +8,6 @@ export default {
       count += v.count
     })
     return count
-  },
-  getRequestList (state) {
-    state.requestList = state.requestList.filter(r => r.status === '0')
-    return state.requestList
-  },
-  getNewMes (state) {
-    return state.newMes
   }
+
 }

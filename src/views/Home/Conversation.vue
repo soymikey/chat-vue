@@ -48,11 +48,11 @@ import env from '../../../config/env'
 import api from '@/api'
 import { formatTime } from '@/utils/utils'
 export default {
+  props: ['currSation'],
+
   data () {
     return {
       scrollBoxHeight: '',
-      me: require('../../assets/me.jpg'),
-      other: require('../../assets/other.jpg'),
 
       // type 0 共有 1 群聊 2 好友
       navList: [
@@ -85,25 +85,18 @@ export default {
   },
   sockets: {
     org (r) {
-      if (r.roomid === this.$route.params.id) {
+      if (r.roomid === this.currSation.id) {
         this.chatList.push(Object.assign({}, r, { type: 'org' }))
       }
     },
     mes (r) {
-      if (r.roomid === this.$route.params.id) {
+      if (r.roomid === this.currSation.id) {
         this.chatList.push(Object.assign({}, r, { type: 'other' }))
-        this.$socket.emit('setReadStatus', {
-          roomid: r.roomid,
-          name: this.user.name
-        })
+        this.$socket.emit('setReadStatus', { roomid: r.roomid, name: this.user.name })
         this.$store.commit('setUnRead', { roomid: r.roomid, clear: true })
-        // this.$nextTick(() => {
-        //   this.$refs.scrollerBottom.reset({ top: '100%' })
-        // })
       }
     },
-    getHistoryMessages (r) {
-      // 获取历史消息
+    getHistoryMessages (r) { // 获取历史消息
       if (r.length) {
         this.$emit('NewMes', r[r.length - 1])
       }
@@ -125,51 +118,17 @@ export default {
   mounted () {
     this.scrollBoxHeight =
       document.documentElement.clientHeight - 46 - 46 + 'px'
-    //   // xs-container
-    // const declaration = document.getElementsByClassName('xs-container')[0].style
-    // // const declaration = this.$refs.scrollerBottom.$el.getElementsByClassName('xs-container')[0].style
-    // const height = declaration.getPropertyValue('cssText')
-    // console.log('this.$refs.scrollerBottom', height)
-
-    // this.$nextTick(() => {
-    //   this.$refs.scrollerBottom.reset({ bottom: 20 })
-    // })
-    const v = this.$route.params
-
-    if (!v.id) {
-      this.chatList = []
-    }
-    this.offset = 1
-    this.groupUserList = []
-    this.chatLoading = true
-    this.currNav = 0 // 标签选中第一个
-    if (v.type === 'group' || v.type === 'friend') {
-      if (v.type === 'group') {
-        this.getGroupUsers(v.id)
-      }
-      this.$socket.emit('setReadStatus', {
-        roomid: v.id,
-        name: this.user.name
-      })
-      this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-      this.$socket.emit('getHistoryMessages', {
-        roomid: v.id,
-        offset: 1,
-        limit: 100
-      })
-    }
   },
   computed: {
     ...mapState(['user', 'OnlineUser'])
   },
   watch: {
-    $route (to, from) {
-      if (to.name === 'conversation') {
-        const v = this.$route.params
-
+    currSation: { // 当前会话
+      handler (v) {
         if (!v.id) {
           this.chatList = []
         }
+
         this.offset = 1
         this.groupUserList = []
         this.chatLoading = true
@@ -178,50 +137,23 @@ export default {
           if (v.type === 'group') {
             this.getGroupUsers(v.id)
           }
-          this.$socket.emit('setReadStatus', {
-            roomid: v.id,
-            name: this.user.name
-          })
+          this.$socket.emit('setReadStatus', { roomid: v.id, name: this.user.name })
           this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-          this.$socket.emit('getHistoryMessages', {
-            roomid: v.id,
-            offset: 1,
-            limit: 100
-          })
+          this.$socket.emit('getHistoryMessages', { roomid: v.id, offset: 1, limit: 100 })
         }
-      }
+      },
+      deep: true,
+      immediate: true
     },
-    // currSation: { // 当前会话
-    //   handler (v) {
-    //     if (!v.id) {
-    //       this.chatList = []
-    //     }
-    //     this.offset = 1
-    //     this.groupUserList = []
-    //     this.chatLoading = true
-    //     this.currNav = 0 // 标签选中第一个
-    //     if (v.type === 'group' || v.type === 'friend') {
-    //       if (v.type === 'group') {
-    //         this.getGroupUsers(v.id)
-    //       }
-    //       this.$socket.emit('setReadStatus', { roomid: v.id, name: this.user.name })
-    //       this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-    //       this.$socket.emit('getHistoryMessages', { roomid: v.id, offset: 1, limit: 100 })
-    //     }
-    //   },
-    //   deep: true,
-    //   immediate: true
-    // },
-    // OnlineUser: { // 在线成员
-    //   handler (obj) {
-    //     const { currSation } = this.$route.params
-    //     if (currSation.type && currSation.type === 'group') {
-    //       this.getGroupUsers(currSation.id)
-    //     }
-    //   },
-    //   immediate: true,
-    //   deep: true
-    // },
+    OnlineUser: { // 在线成员
+      handler (obj) {
+        if (this.currSation.type && this.currSation.type === 'group') {
+          this.getGroupUsers(this.currSation.id)
+        }
+      },
+      immediate: true,
+      deep: true
+    },
     currTool (v, old) {
       if (!v) {
         document.documentElement.removeEventListener('click', this.watchMouse)
@@ -229,8 +161,7 @@ export default {
     }
   },
   methods: {
-    send (params, type = 'mess') {
-      // 发送消息
+    send (params, type = 'mess') { // 发送消息
       if (!this.message && !params) {
         return
       }
@@ -241,12 +172,11 @@ export default {
         avatar: this.user.photo,
         nickname: this.user.nickname,
         read: [this.user.name],
-        roomid: this.$route.params.id,
+        roomid: this.currSation.id,
         style: 'mess',
         userM: this.user.id
       }
-      if (type === 'emoji') {
-        // 发送表情
+      if (type === 'emoji') { // 发送表情
         val.style = 'emoji'
         val.mes = '表情'
         val.emoji = params
@@ -261,10 +191,8 @@ export default {
       }
       this.chatList.push(Object.assign({}, val, { type: 'mine' }))
       this.$socket.emit('mes', val)
-
       this.$emit('NewMes', val)
-      if (type === 'mess') {
-        // 发送文字
+      if (type === 'mess') { // 发送文字
         this.message = ''
       }
     },

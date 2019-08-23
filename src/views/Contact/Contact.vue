@@ -10,20 +10,7 @@
       :scroll-bottom-offst="200"
     >
       <div>
-<div v-for="(item,index) in getRequestList" :key="index" @click="goToFRiendVerify(item)" >
-          <panel >
-            <div slot="body" class="panel_container">
-              <div class="avartar_container">
-                <img width="100%" :src="IMG_URL+item.avatar" />
-                <badge class="badge"  ></badge>
-              </div>
-              <div class="body">
-                <div class="title">{{item.name}}</div>
-                <div class="content">{{item.mes}}</div>
-              </div>
-            </div>
-          </panel>
-        </div>
+
         <group>
           <cell is-link :title="item.name+index" v-for="(item,index) in list" :key="index">
             <img slot="icon" width="35" style="display:block;margin-right:15px; " :src="item.icon" />
@@ -87,7 +74,6 @@ export default {
     this.scrollBoxHeight = document.documentElement.clientHeight - 46 - 54 + 'px'
   },
   computed: {
-    ...mapGetters(['getRequestList'])
 
   },
   watch: {},
