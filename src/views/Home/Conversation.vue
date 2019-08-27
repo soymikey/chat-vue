@@ -1,32 +1,35 @@
 <template>
   <div class="explore_container">
     <x-header>{{this.$route.params.name}}</x-header>
-
-    <scroller lock-x :height="scrollBoxHeight" ref="scrollerBottom" :scroll-bottom-offst="250">
-
-      <div >
-        <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
-          <div v-if="item.type==='mine'" class="mine_container">
-            <div class="mine_content">
-              {{item.mes}}
-              <span class="my_spike"></span>
+   <div v-transfer-dom>
+      <loading :show="chatLoading" text="加载中"></loading>
+    </div>
+    <scroller lock-x height="-92" ref="scrollerEvent" >
+      <div>
+        <div ref="scrollerHeight">
+          <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
+            <div v-if="item.type==='mine'" class="mine_container">
+              <div class="mine_content">
+                {{item.mes}}
+                <span class="my_spike"></span>
+              </div>
+              <img class="img" :src="IMG_URL+item.avatar" />
             </div>
-            <img class="img" :src="IMG_URL+item.avatar" />
-          </div>
-          <div v-else class="other_container">
-            <img class="img" :src="IMG_URL+item.avatar" />
-            <div class="other_content">
-              {{item.mes}}
-              <span class="other_spike"></span>
+            <div v-else class="other_container">
+              <img class="img" :src="IMG_URL+item.avatar" />
+              <div class="other_content">
+                {{item.mes}}
+                <span class="other_spike"></span>
+              </div>
             </div>
           </div>
+          <!-- <div style="height:46px"></div> -->
         </div>
-        <div style="height:30px"></div>
       </div>
     </scroller>
 
-    <group style="position:absolute;bottom:0;width:100%;">
-      <x-input name="mobile" placeholder="请输入消息" v-model="message">
+    <group style="position:fixed;bottom:0;width:100%;">
+      <x-input type="text" placeholder="请输入消息" v-model="message" @on-enter="send">
         <i
           slot="label"
           style="padding-right:10px;display:block;"
@@ -34,10 +37,7 @@
           height="50"
           class="iconfont icon-message"
         ></i>
-
-          <x-button slot="right" @click.native="send" mini type="primary">发送</x-button>
       </x-input>
-
     </group>
   </div>
 </template>
@@ -48,13 +48,15 @@ import { mapState } from 'vuex'
 import env from '../../../config/env'
 import api from '@/api'
 import { formatTime } from '@/utils/utils'
-export default {
-  props: ['currSation'],
+import { setTimeout } from 'timers'
+import { TransferDom } from 'vux'
 
+export default {
+  directives: {
+    TransferDom
+  },
   data () {
     return {
-      scrollBoxHeight: '',
-
       // type 0 共有 1 群聊 2 好友
       navList: [
         { name: '聊天', type: 'group,friend', id: 0 },
@@ -91,16 +93,33 @@ export default {
       }
     },
     mes (r) {
-      if (r.roomid === this.currSation.id) {
+      if (
+        r.roomid === this.currSation.id &&
+        this.$route.name === 'conversation'
+      ) {
+        console.log('r', r)
+
         this.chatList.push(Object.assign({}, r, { type: 'other' }))
-        this.$socket.emit('setReadStatus', { roomid: r.roomid, name: this.user.name })
+        this.$socket.emit('setReadStatus', {
+          roomid: r.roomid,
+          name: this.user.name
+        })
         this.$store.commit('setUnRead', { roomid: r.roomid, clear: true })
+        this.goToBottom()
       }
     },
-    getHistoryMessages (r) { // 获取历史消息
+    getHistoryMessages (r) {
+      // 获取历史消息
       if (r.length) {
-        this.$emit('NewMes', r[r.length - 1])
+        // this.$emit('NewMes', r[r.length - 1])
+        this.$store.commit('setUnRead', {
+          roomid: r[0].roomid,
+          clear: true,
+          count: 0,
+          lastMes: r[r.length - 1].mes
+        })
       }
+
       this.chatList = r.map(v => {
         if (v.type !== 'org') {
           if (v.name === this.user.name) {
@@ -111,20 +130,25 @@ export default {
         }
         return v
       })
+      this.goToBottom()
+
+      this.chatLoading = false
     }
   },
 
   created () {},
 
   mounted () {
-    this.scrollBoxHeight =
-      document.documentElement.clientHeight - 46 - 46 + 'px'
+
   },
   computed: {
-    ...mapState(['user', 'OnlineUser'])
+    ...mapState(['user', 'OnlineUser', 'currSation'])
+
   },
   watch: {
-    currSation: { // 当前会话
+    currSation: {
+      // 当前会话
+
       handler (v) {
         if (!v.id) {
           this.chatList = []
@@ -132,21 +156,32 @@ export default {
 
         this.offset = 1
         this.groupUserList = []
-        this.chatLoading = true
+
         this.currNav = 0 // 标签选中第一个
         if (v.type === 'group' || v.type === 'friend') {
           if (v.type === 'group') {
             this.getGroupUsers(v.id)
           }
-          this.$socket.emit('setReadStatus', { roomid: v.id, name: this.user.name })
+          this.chatLoading = true
+
+          this.$socket.emit('setReadStatus', {
+            roomid: v.id,
+            name: this.user.name
+          })
           this.$store.commit('setUnRead', { roomid: v.id, clear: true })
-          this.$socket.emit('getHistoryMessages', { roomid: v.id, offset: 1, limit: 100 })
+          this.$socket.emit('getHistoryMessages', {
+            roomid: v.id,
+            offset: 1,
+            limit: 100
+          })
         }
       },
       deep: true,
       immediate: true
     },
-    OnlineUser: { // 在线成员
+
+    OnlineUser: {
+      // 在线成员
       handler (obj) {
         if (this.currSation.type && this.currSation.type === 'group') {
           this.getGroupUsers(this.currSation.id)
@@ -162,7 +197,16 @@ export default {
     }
   },
   methods: {
-    send (params, type = 'mess') { // 发送消息
+    goToBottom () {
+      if (this.$refs.scrollerHeight.clientHeight > document.body.clientHeight) {
+        const scrollerInnerHeight = this.$refs.scrollerHeight.clientHeight - document.body.clientHeight + 120
+        console.log('scrollerInnerHeight', scrollerInnerHeight)
+        this.$refs.scrollerEvent.reset({ top: scrollerInnerHeight })
+      }
+    },
+    send (params, event, type = 'mess') {
+      // 发送消息
+      this.goToBottom()
       if (!this.message && !params) {
         return
       }
@@ -177,7 +221,8 @@ export default {
         style: 'mess',
         userM: this.user.id
       }
-      if (type === 'emoji') { // 发送表情
+      if (type === 'emoji') {
+        // 发送表情
         val.style = 'emoji'
         val.mes = '表情'
         val.emoji = params
@@ -192,8 +237,15 @@ export default {
       }
       this.chatList.push(Object.assign({}, val, { type: 'mine' }))
       this.$socket.emit('mes', val)
-      this.$emit('NewMes', val)
-      if (type === 'mess') { // 发送文字
+      this.$store.commit('setUnRead', {
+        roomid: val.roomid,
+        count: 0,
+        lastMes: val.mes
+      })
+      console.log('tyope', type)
+
+      if (type === 'mess') {
+        // 发送文字
         this.message = ''
       }
     },

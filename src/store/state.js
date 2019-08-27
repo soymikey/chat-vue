@@ -7,8 +7,7 @@ export default {
   conversationsList: [], // 会话列表
   OnlineUser: {}, // 在线人数
   unRead: [], // 未读消息
-  unReadRequest: [], // 未读验证消息
+  currSation: {},
   Vchat: {}, // 官方账号信息
-  newMes: {}, // 最新的消息
-  requestList: [] // 请求消息
+  unReadRequest: []// 未读请求消息
 }

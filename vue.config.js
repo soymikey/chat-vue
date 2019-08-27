@@ -1,4 +1,5 @@
-import env from './config/env'
+
+// const env = require('./config/env')
 const vuxLoader = require('vux-loader')
 const themeConfig = {
   name: 'less-theme',
@@ -24,8 +25,8 @@ module.exports = {
     // assetsPublicPath: '/',
     proxy: {
       '/v': {
-        target: env.serverUrl,
-        // target: 'http://localhost:9988',
+        // target: env.serverUrl,
+        target: 'http://localhost:9988',
         changeOrigin: true // 是否在本机创建target地址的虚拟服务，避免跨域问题
       },
       '/api': {

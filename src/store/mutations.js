@@ -25,44 +25,71 @@ export default {
         }
       }
     }
+
+
   },
   setOnlineUser (state, data) {
     state.OnlineUser = data
   },
-  setUnReadRequest (state, data) {
-    if (typeof (data) === 'object') {
-      state.unReadRequest.push(data)
-    } else if (data.length) {
-      state.unReadRequest = data
-    } else {
-      console.log('i am here')
 
-      state.unReadRequest = []
-    }
-  },
   setUnRead (state, data) {
     if (data.clear) {
       state.unRead.forEach(v => {
         if (v.roomid === data.roomid) {
           v.count = 0
+          // v.lastMes = data.lastMes
         }
       })
       return
     }
+
     let unRead = state.unRead.filter(v => v.roomid === data.roomid)
+
     if (unRead.length) {
       state.unRead.forEach(v => {
         if (v.roomid === data.roomid) {
           if (data.add) {
             v.count++
+            v.lastMes = data.lastMes
           } else {
             v.count = data.count
+            v.lastMes = data.lastMes
           }
         }
       })
     } else {
-      state.unRead.push({ roomid: data.roomid, count: data.count })
+      state.unRead.push({ roomid: data.roomid, count: data.count, lastMes: data.lastMes })
     }
-  }
+  },
+  setCurrSation (state, data) {
+    state.currSation = data
+  },
+  setUnReadRequest (state, data) {
+    if (data.reset) {
+      state.unReadRequest = data.content
+    } else {
+      if (Array.isArray(data)) {
+        state.unReadRequest = state.unReadRequest.concat(data.content)
+      } else {
+        state.unReadRequest.push(data.content)
+      }
+    }
 
-}
+  //   let unReadRequest = state.unReadRequest.filter(v => v.roomid === data.roomid)
+  //   if (unReadRequest.length) {
+  //     state.unReadRequest.forEach(v => {
+  //       if (v.roomid === data.roomid) {
+  //         if (data.add) {
+  //           v.count++
+  //           v.content = data.content
+  //         } else {
+  //           v.count = data.count
+  //           v.content = data.content
+  //         }
+  //       }
+  //     })
+  //   } else {
+  //     state.unReadRequest.push({ roomid: data.roomid, count: data.count, content: data.content })
+  //   }
+  // }
+  } }

@@ -2,32 +2,23 @@
 <template>
   <div class="layout">
     <keep-alive>
-      <router-view :currSation='conversationCurrSation'
-      @setConversationCurrSation="setConversationCurrSation"
-      @NewMes='getNewMes'
-       :latestMes='homeLatestMes'
-      :unReadRequest='unReadRequest'
-      ></router-view>
+      <router-view :key="$route.fullPath"></router-view>
     </keep-alive>
 
-    <tabbar v-show='isMainNav'>
-      <tabbar-item link="/home" :badge='unReadCount.toString()' v-if='unReadCount !== 0'>
-        <i slot="icon" class="iconfont icon-message"></i>
-        <span slot="label">微信</span>{{unReadRequest}}
-      </tabbar-item>
-      <tabbar-item link="/home" v-else>
+    <tabbar v-show="isMainNav">
+      <tabbar-item link="/home" :badge="unReadCount !== 0?unReadCount.toString():null">
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
 
-      <tabbar-item  link="/contact"  :badge='unReadRequest.length.toString()' v-if='unReadRequest.length !== 0'>
+      <tabbar-item
+        link="/contact"
+        :badge="unReadRequest.length!== 0?unReadRequest.length.toString():null"
+      >
         <i slot="icon" class="iconfont icon-contact"></i>
         <span slot="label">通讯录</span>
       </tabbar-item>
-      <tabbar-item  link="/contact" v-else >
-        <i slot="icon" class="iconfont icon-contact"></i>
-        <span slot="label">通讯录</span>
-      </tabbar-item>
+
       <tabbar-item link="/explore">
         <i slot="icon" class="iconfont icon-explore"></i>
         <span slot="label">发现</span>
@@ -36,7 +27,6 @@
         <i slot="icon" class="iconfont icon-user"></i>
         <span slot="label">我</span>
       </tabbar-item>
-
     </tabbar>
   </div>
 </template>
@@ -46,50 +36,75 @@ import { mapState, mapGetters } from 'vuex'
 import { formatTime } from '../utils/utils'
 export default {
   data () {
-    return {
-      conversationCurrSation: {},
-      homeLatestMes: {}
-
-    }
+    return {}
   },
   components: {},
   sockets: {
     connect: function (val) {
       console.log(this.$socket.id)
       console.log('连接成功')
+      this.$router.replace({ name: 'register' })
+      // this.$store.dispatch('getUserInfo', this)
     },
-    customEmit: function (val) {
-      console.log('连接失败')
-    },
+
     joined (OnlineUser) {
       console.log('加入了', OnlineUser)
       this.$store.commit('setOnlineUser', OnlineUser)
     },
-    leaved (OnlineUser) {
-      this.$store.commit('setOnlineUser', OnlineUser)
-    },
-    getHistoryMessages (mesdata) { // 获取未读消息数量
-      let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1)
-      let requestList = mesdata.filter(v => v.type === 'validate' && v.status === '0')
+
+    getHistoryMessages (mesdata) {
+      let data = mesdata.filter(
+        v =>
+          v.read.indexOf(this.user.name) === -1 &&
+          v.type !== 'info' &&
+          v.type !== 'validate'
+      )
+      let validate = mesdata.filter(
+        v => v.type === 'validate' && v.status === '0'
+      )
+
+      // let data = mesdata.filter(v => v.read.indexOf(this.user.name) === -1 && v.type !== 'info' && v.type !== 'validate')
+      // 聊天历史记录
+
       if (data.length) {
-        this.$store.commit('setUnRead', { roomid: data[0].roomid, count: data.length })
-        this.getNewMes(mesdata[mesdata.length - 1])
+        this.$store.commit('setUnRead', {
+          roomid: data[0].roomid,
+          count: data.length,
+          lastMes: data[data.length - 1].mes
+        })
+      } else {
+        if (mesdata.length) {
+          this.$store.commit('setUnRead', {
+            roomid: mesdata[0].roomid,
+            count: 0,
+            lastMes: mesdata[mesdata.length - 1].mes
+          })
+        } else {
+          this.$store.commit('setUnRead', { roomid: 0, count: 0, lastMes: '' })
+        }
       }
-
-      if (requestList.length) {
-        this.$store.commit('setUnReadRequest', requestList)
+      if (validate.length) {
+        this.$store.commit('setUnReadRequest', {
+          reset: false,
+          content: validate
+        })
       }
     },
-    mes (r) { // 更改未读消息数量
-      if (r.typpe !== 'validate') {
-        this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
-      }
+    mes (r) {
+      // 更改未读消息数量
 
-      this.getNewMes(r)
+      this.$store.commit('setUnRead', {
+        roomid: r.roomid,
+        add: true,
+        count: 1,
+        lastMes: r.mes
+      })
     },
     takeValidate (r) {
-      // this.$store.commit('setUnRead', { roomid: r.roomid, add: true, count: 1 })
-      this.getNewMes(r)
+      if (r.type === 'validate') {
+        this.$store.commit('setUnReadRequest', { reset: false, content: r })
+      }
+
       if (r.type === 'info') {
         this.$store.dispatch('getUserInfo')
       }
@@ -97,9 +112,11 @@ export default {
   },
   computed: {
     ...mapState(['user', 'conversationsList', 'OnlineUser', 'unReadRequest']),
-    ...mapGetters(['unReadCount', 'List']),
+    ...mapGetters(['unReadCount', 'unReadRequestCount']),
     isMainNav () {
-      return ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1
+      return (
+        ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1
+      )
     }
   },
   watch: {
@@ -116,6 +133,7 @@ export default {
       if (!this.user.name) {
         return
       }
+
       this.conversationsList.forEach(v => {
         let val = {
           name: this.user.name,
@@ -123,8 +141,8 @@ export default {
           avatar: this.user.photo,
           roomid: v.id
         }
-        let room = { roomid: v.id, offset: 1, limit: 200 }
 
+        let room = { roomid: v.id, offset: 1, limit: 200 }
         this.$socket.emit('join', val)
         this.$socket.emit('getHistoryMessages', room)
       })
@@ -138,10 +156,8 @@ export default {
       }
       this.homeLatestMes = value
     }
-
   }
 }
 </script>
 <style lang="scss" scoped>
-
 </style>

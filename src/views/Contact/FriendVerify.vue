@@ -28,7 +28,6 @@ import { mapState } from 'vuex'
 import env from '../../../config/env'
 
 export default {
-  props: ['unReadRequest'],
   sockets: {
     ValidateSuccess () {
       this.$store.dispatch('getUserInfo', this)
@@ -49,7 +48,7 @@ export default {
     this.friendInfo = this.$route.params
   },
   computed: {
-    ...mapState(['user'])
+    ...mapState(['user', 'unReadRequest'])
 
   },
   watch: {
@@ -65,9 +64,8 @@ export default {
       this.$socket.emit('agreeValidate', v)
 
       const newRequestUnRead = this.unReadRequest.filter(m => m.name !== v.name)
-      console.log('newRequestUnRead', newRequestUnRead)
 
-      this.$store.commit('setUnReadRequest', newRequestUnRead)
+      this.$store.commit('setUnReadRequest', { reset: true, content: newRequestUnRead })
     }
 
   }

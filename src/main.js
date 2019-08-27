@@ -3,11 +3,12 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import env from '../config/env'
-// import 'normalize.css'
+
 import 'vux/src/styles/reset.less'
 import VueSocketio from 'vue-socket.io'
 import socketio from 'socket.io-client'
-import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
+import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, Loading, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
+// import 'normalize.css'
 
 Vue.use(VueSocketio, socketio(env.socketIo))
 
@@ -31,6 +32,7 @@ Vue.component('button-tab-item', ButtonTabItem)
 Vue.component('toast', Toast)
 Vue.component('x-textarea', XTextarea)
 Vue.component('confirm', Confirm)
+Vue.component('loading', Loading)
 Vue.use(ToastPlugin)
 Vue.config.productionTip = false
 new Vue({

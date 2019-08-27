@@ -8,6 +8,15 @@ export default {
       count += v.count
     })
     return count
+  },
+  unReadRequestCount (state) {
+    let count = 0
+
+    state.unReadRequest.forEach(v => {
+      count += v.count
+    })
+
+    return count
   }
 
 }

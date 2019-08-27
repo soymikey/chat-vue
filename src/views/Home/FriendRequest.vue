@@ -65,7 +65,7 @@ export default {
         type: 'validate',
         status: '0'
       }
-
+      this.introduce = ''
       this.$socket.emit('sendValidate', val)
       this.showConfirm = true
     }

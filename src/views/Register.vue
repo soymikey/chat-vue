@@ -138,17 +138,16 @@ export default {
       }
     },
     login () {
-      if (this.signForm.name === '') {
-        this.toast('请输入账号', 'warn')
-      } else if (this.signForm.pass === '') {
-        this.toast('请输入密码', 'warn')
-      }
       // else if (
       //   this.signForm.regcode.toLowerCase() !== this.initCode.toLowerCase()
       // ) {
       //   this.toast('验证码不正确', 'warn')
       // }
-      else {
+      if (this.signForm.name === '') {
+        this.toast('请输入账号', 'warn')
+      } else if (this.signForm.pass === '') {
+        this.toast('请输入密码', 'warn')
+      } else {
         let params = {
           name: this.signForm.name,
           pass: this.signForm.pass

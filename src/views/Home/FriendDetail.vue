@@ -19,7 +19,7 @@
         <p></p>
       </div>
       <div class="detail-button" v-if="friendInfo.code !== user.code">
-        <x-button type="primary" @click.native="apply" v-if="!myFriendFlag">加为好友</x-button>
+        <x-button type="primary" @click.native="apply" v-if="!myFriendFlag">添加好友</x-button>
         <x-button type="primary" @click.native="remove" v-else>删除好友</x-button>
       </div>
     </div>

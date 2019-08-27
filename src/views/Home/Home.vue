@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- {{conversationsList}} -->
+
     <x-header
       :left-options="{showBack: false}"
       :right-options="{showMore: true}"
@@ -19,20 +19,22 @@
 
       <div>
         <div v-for="(item,index) in contactsList" :key="index" @click="goToConversation(item)">
+
           <panel>
+
             <div slot="body" class="panel_container">
               <div class="avartar_container">
                 <img width="100%" :src="IMG_URL+item.photo" />
-                <badge v-if="item.unRead !== 0" class="badge" :text="item.unRead" :max="99"></badge>
+                <badge v-if="item.unRead !== 0 &&Object.keys(item).indexOf('unRead')!==-1" class="badge" :text="item.unRead" :max="99"></badge>
               </div>
               <div class="body">
                 <div class="title">{{item.name}}</div>
-                <div class="content">{{item.newMes}}</div>
+                <div class="content">{{item.lastMes}}</div>
               </div>
             </div>
           </panel>
         </div>
-        <load-more tip="loading"></load-more>
+        <!-- <load-more tip="loading"></load-more> -->
       </div>
     </scroller>
     <div v-transfer-dom>
@@ -47,7 +49,6 @@ import { mapState } from 'vuex'
 import api from '@/api'
 import env from '../../../config/env'
 export default {
-  props: ['latestMes'],
   directives: {
     TransferDom
   },
@@ -66,7 +67,6 @@ export default {
       bottomCount: 20,
       type: '5',
       // ------------------
-      currSation: {}, // 当前会话
       contactsList: [], // 会话列表
       IMGURL: process.env.IMG_URL,
       settingFlag: {
@@ -84,39 +84,42 @@ export default {
   },
 
   computed: {
-    ...mapState(['user', 'conversationsList', 'Vchat', 'unRead'])
+    ...mapState(['user', 'conversationsList', 'currSation', 'Vchat', 'unRead'])
+
   },
   watch: {
     conversationsList: {
       handler (list) {
-        console.log('conversationsList')
-        
+        this.contactsList = list
         this.contactsList = JSON.parse(JSON.stringify(list))
         if (!this.currSation.id && list.length) {
-          this.currSation = this.contactsList[0]
+          this.$store.commit('setCurrSation', this.contactsList[0])
         }
         if (!list.length) {
-          this.currSation = {}
+          this.$store.commit('setCurrSation', {})
         }
         if (!isNaN(this.removeSation.index)) {
           if (
             this.currSation.id === this.removeSation.item.id &&
             this.contactsList.length !== 0
           ) {
-            this.currSation =
+            let result =
               this.contactsList[this.removeSation.index] ||
               this.contactsList[this.removeSation.index - 1] ||
               this.contactsList[this.removeSation.index + 1]
+
+            this.$store.commit('setCurrSation', result)
           }
         }
       },
       deep: true,
       immediate: true
     },
+
     contactsList: {
       handler (list) {
         if (!list.length) {
-          this.currSation = {}
+          this.$store.commit('setCurrSation', {})
         }
       },
       deep: true
@@ -129,7 +132,7 @@ export default {
               this.$set(
                 this.contactsList,
                 i,
-                Object.assign({}, v, { unRead: m.count })
+                Object.assign({}, v, { unRead: m.count, lastMes: m.lastMes })
               )
             }
           })
@@ -137,14 +140,11 @@ export default {
       },
       deep: true,
       immediate: true
-    },
-    latestMes: {
-      handler (value) {
-        this.getNewMes(value)
-      }
     }
+
   },
   methods: {
+
     onScrollBottom () {},
     refresh () {
       console.log('refresh')
@@ -155,8 +155,9 @@ export default {
       }
     },
     goToConversation (value) {
-      this.$emit('setConversationCurrSation', value)
-      this.$router.push({ name: 'conversation' })
+      this.$store.commit('setCurrSation', value)
+
+      this.$router.push({ path: `/conversation/${value.id}` })
     },
     // --------------------------------------
     setCurrSation (v) {
