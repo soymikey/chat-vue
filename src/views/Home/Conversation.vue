@@ -1,24 +1,34 @@
 <template>
   <div class="explore_container">
     <x-header>{{this.$route.params.name}}</x-header>
-   <div v-transfer-dom>
+    <div v-transfer-dom>
       <loading :show="chatLoading" text="加载中"></loading>
     </div>
-    <scroller lock-x height="-92" ref="scrollerEvent" >
+    {{this.showEmoji.f}}
+    <scroller lock-x height="-92" ref="scrollerEvent">
       <div>
         <div ref="scrollerHeight">
           <div v-for="(item,index) in chatList" :key="index" class="coversation_box-container">
             <div v-if="item.type==='mine'" class="mine_container">
-              <div class="mine_content">
+              <div class="mine_content" v-if="item.style==='mess'">
                 {{item.mes}}
                 <span class="my_spike"></span>
               </div>
+              <div class="mine_content" v-if="item.style==='img'">
+                <img class="content_image" :src="IMG_URL+item.emoji" />
+                <span class="other_spike"></span>
+              </div>
+
               <img class="img" :src="IMG_URL+item.avatar" />
             </div>
             <div v-else class="other_container">
               <img class="img" :src="IMG_URL+item.avatar" />
-              <div class="other_content">
+              <div class="other_content" v-if="item.style==='mess'">
                 {{item.mes}}
+                <span class="other_spike"></span>
+              </div>
+              <div class="other_content" v-if="item.style==='img'">
+                <img class="content_image" :src="IMG_URL+item.emoji" />
                 <span class="other_spike"></span>
               </div>
             </div>
@@ -28,16 +38,51 @@
       </div>
     </scroller>
 
-    <group style="position:fixed;bottom:0;width:100%;">
-      <x-input type="text" placeholder="请输入消息" v-model="message" @on-enter="send">
+    <group style="position:absolute;bottom:0;width:100%;">
+      <x-input
+        type="text"
+        placeholder="请输入消息"
+        v-model="message"
+        @on-enter="send"
+        :show-clear="false"
+        ref="input"
+        @on-focus="isShowKeyboard"
+      >
         <i
           slot="label"
-          style="padding-right:10px;display:block;"
-          width="50"
-          height="50"
-          class="iconfont icon-message"
+          style="padding-right:10px;display:block; font-size: 24px;"
+          class="iconfont icon-speaker"
         ></i>
+
+        <i
+          slot="right"
+          v-if="!showEmoji.f"
+          class="iconfont icon-emoji"
+          style="font-size: 24px; margin-right:10px"
+          @click="hideKeyboard"
+        ></i>
+        <i
+          slot="right"
+          v-else
+          class="iconfont icon-keyboard"
+          style="font-size: 24px; margin-right:10px"
+          @click="showKeyboard"
+        ></i>
+
+        <i slot="right" class="iconfont icon-add" style="font-size: 24px;"></i>
       </x-input>
+      <!-- <textarea type="text" placeholder="请输入消息" v-model="message"  @on-enter="send" ></textarea> -->
+      <ul class="emoji-default" v-if="showEmoji.f ">
+        <li v-for="(m, n) in emojiJson" :key="n" @click.stop="chooseEmojiDefault(m)">{{m}}</li>
+      </ul>
+      <ul class="moreOptions-default" v-if="true ">
+        <li v-for="(item, n) in moreOptionsList" :key="n" @click.stop="chooseEmojiDefault(item)">
+          <div class="item-container">
+            <i :class="'icon-'+item.className" class="iconfont"></i>
+            <p>{{item.name}}</p>
+          </div>
+        </li>
+      </ul>
     </group>
   </div>
 </template>
@@ -47,6 +92,8 @@ import { mapState } from 'vuex'
 
 import env from '../../../config/env'
 import api from '@/api'
+import emojiJson from '@/utils/emoji'
+
 import { formatTime } from '@/utils/utils'
 import { setTimeout } from 'timers'
 import { TransferDom } from 'vux'
@@ -72,8 +119,7 @@ export default {
         f: false
       },
       groupUsers: [], // 群成员
-      uplaodVisible: {
-        // 上传
+      showMoreOptions: {
         f: false
       },
       photoSwipeFlag: false, // 图片放大器
@@ -83,7 +129,18 @@ export default {
       loadmoreLoading: false,
       groupUserList: [], // 长列表渲染
       offset: 1, // 群成员页码
-      limit: 50
+      limit: 50,
+      emojiJson: emojiJson.data.split(','),
+      moreOptionsList: [
+        { name: '照片', className: 'picture' },
+        { name: '拍摄', className: 'camera' },
+        { name: '语音通话', className: 'voice-call' },
+        { name: '位置', className: 'location' },
+        { name: '红包', className: 'envelop' },
+        { name: '语音输入', className: 'voice-input' },
+        { name: '收藏', className: 'collection' },
+        { name: '个人名片', className: 'personal-card' }
+      ]
     }
   },
   sockets: {
@@ -97,8 +154,6 @@ export default {
         r.roomid === this.currSation.id &&
         this.$route.name === 'conversation'
       ) {
-        console.log('r', r)
-
         this.chatList.push(Object.assign({}, r, { type: 'other' }))
         this.$socket.emit('setReadStatus', {
           roomid: r.roomid,
@@ -138,12 +193,9 @@ export default {
 
   created () {},
 
-  mounted () {
-
-  },
+  mounted () {},
   computed: {
     ...mapState(['user', 'OnlineUser', 'currSation'])
-
   },
   watch: {
     currSation: {
@@ -197,9 +249,28 @@ export default {
     }
   },
   methods: {
+    hideKeyboard () {
+      this.showEmoji.f = true
+      document.activeElement.blur()
+    },
+    showKeyboard () {
+      this.showEmoji.f = false
+      this.$refs.input.focus()
+    },
+    isShowKeyboard (value, event) {
+      if (this.showEmoji.f) {
+        document.activeElement.blur()
+      }
+    },
+    isShowEmoji () {
+      this.showEmoji = !this.showEmoji
+    },
     goToBottom () {
       if (this.$refs.scrollerHeight.clientHeight > document.body.clientHeight) {
-        const scrollerInnerHeight = this.$refs.scrollerHeight.clientHeight - document.body.clientHeight + 120
+        const scrollerInnerHeight =
+          this.$refs.scrollerHeight.clientHeight -
+          document.body.clientHeight +
+          120
         console.log('scrollerInnerHeight', scrollerInnerHeight)
         this.$refs.scrollerEvent.reset({ top: scrollerInnerHeight })
       }
@@ -262,7 +333,7 @@ export default {
       } else {
         this.send(file, 'file')
       }
-      this.uplaodVisible.f = false
+      this.showMoreOptions.f = false
     },
     InmageChange () {
       // 发送图片
@@ -341,7 +412,6 @@ export default {
 
     chooseEmojiDefault (em) {
       this.message += em
-      this.showEmoji.f = false
     },
     chooseEmoji (url) {
       this.send(url, 'emoji')
@@ -358,6 +428,55 @@ export default {
 .explore_container {
   background-color: #f7f7fa;
 }
+.emoji-default {
+  width: 100%;
+  height: 202px;
+  overflow-y: auto;
+  padding: 10px;
+  li {
+    display: inline-block;
+    padding: 5px;
+    width: 22px;
+    height: 22px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  li:hover {
+    background-color: #d5d5d5;
+  }
+}
+.moreOptions-default {
+  width: 100%;
+  height: 202px;
+  background-color: #f7f7fa;
+  // padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+
+  li {
+    box-sizing: border-box;
+    width: 25%;
+    list-style-type: none;
+    padding: 4%;
+
+    .item-container {
+      text-align: center;
+      background-color: #fff;
+      border-radius: 20%;
+      width: 100% ;
+
+      i {
+        font-size: 35px;
+        color:  #d5d5d5
+      }
+      p{
+        font-size: 14px;
+        color:  #d5d5d5
+      }
+    }
+  }
+}
 
 .coversation_box-container {
   margin-top: 10px;
@@ -367,15 +486,17 @@ export default {
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+
     .mine_content {
       background-color: #5fc9f8;
-      padding: 10px;
+      padding: 8px;
       border-radius: 3%;
       word-break: break-all;
       margin-right: 10px;
       max-width: 60%;
       position: relative;
+      display: flex;
+      align-items: "center";
       .my_spike {
         background: #5fc9f8;
         height: 8px;
@@ -385,6 +506,14 @@ export default {
         top: 4px;
         transform: translate(-50%, -50%);
         transform: rotate(45deg);
+      }
+      .content_image {
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 5px;
+        img {
+          width: 100%;
+        }
       }
     }
     .img {
@@ -397,15 +526,17 @@ export default {
     width: 100%;
     display: flex;
     justify-content: flex;
-    align-items: center;
+    //  align-items: center;
     .other_content {
       background-color: pink;
-      padding: 10px;
+      padding: 8px;
       border-radius: 3%;
       word-break: break-all;
       margin-left: 10px;
       max-width: 60%;
       position: relative;
+      display: flex;
+      align-items: "center";
       .other_spike {
         background: pink;
         height: 8px;
@@ -415,6 +546,14 @@ export default {
         top: 4px;
         transform: translate(-50%, -50%);
         transform: rotate(45deg);
+      }
+      .content_image {
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 5px;
+        img {
+          width: 100%;
+        }
       }
     }
     .img {
