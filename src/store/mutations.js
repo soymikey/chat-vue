@@ -25,8 +25,6 @@ export default {
         }
       }
     }
-
-
   },
   setOnlineUser (state, data) {
     state.OnlineUser = data
@@ -68,7 +66,7 @@ export default {
     if (data.reset) {
       state.unReadRequest = data.content
     } else {
-      if (Array.isArray(data)) {
+      if (Array.isArray(data.content)) {
         state.unReadRequest = state.unReadRequest.concat(data.content)
       } else {
         state.unReadRequest.push(data.content)

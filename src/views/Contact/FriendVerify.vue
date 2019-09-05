@@ -60,6 +60,7 @@ export default {
     agree (v) {
       v.userYphoto = this.user.photo
       v.userYname = this.user.nickname
+      console.log('agreeValidate', v)
 
       this.$socket.emit('agreeValidate', v)
 

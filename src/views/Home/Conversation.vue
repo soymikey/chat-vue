@@ -4,7 +4,7 @@
     <div v-transfer-dom>
       <loading :show="chatLoading" text="加载中"></loading>
     </div>
-    {{this.showEmoji.f}}
+
     <scroller lock-x height="-92" ref="scrollerEvent">
       <div>
         <div ref="scrollerHeight">
@@ -43,7 +43,7 @@
         type="text"
         placeholder="请输入消息"
         v-model="message"
-        @on-enter="send"
+        @on-enter="send(message,null,'mess')"
         :show-clear="false"
         ref="input"
         @on-focus="isShowKeyboard"
@@ -69,16 +69,24 @@
           @click="showKeyboard"
         ></i>
 
-        <i slot="right" class="iconfont icon-add" style="font-size: 24px;"></i>
+        <i slot="right" class="iconfont icon-add" style="font-size: 24px;"   @click="isShowMoreOptions"></i>
       </x-input>
       <!-- <textarea type="text" placeholder="请输入消息" v-model="message"  @on-enter="send" ></textarea> -->
       <ul class="emoji-default" v-if="showEmoji.f ">
         <li v-for="(m, n) in emojiJson" :key="n" @click.stop="chooseEmojiDefault(m)">{{m}}</li>
       </ul>
-      <ul class="moreOptions-default" v-if="true ">
-        <li v-for="(item, n) in moreOptionsList" :key="n" @click.stop="chooseEmojiDefault(item)">
+      <ul class="moreOptions-default" v-if="showMoreOptions.f">
+        <li >
+          <div class="item-container picture-container">
+            <i class="icon-picture iconfont"><input type="file"  class='upload-picture' title="选择图片" @change="InmageChange" ref="chooseInmage" accept="image/png, image/jpeg, image/gif, image/jpg"></i>
+
+            <p>照片</p>
+          </div>
+        </li>
+        <li v-for="(item, n) in moreOptionsList" :key="n" @click.stop="chooseFromMoreOptions(item)">
           <div class="item-container">
             <i :class="'icon-'+item.className" class="iconfont"></i>
+
             <p>{{item.name}}</p>
           </div>
         </li>
@@ -132,7 +140,7 @@ export default {
       limit: 50,
       emojiJson: emojiJson.data.split(','),
       moreOptionsList: [
-        { name: '照片', className: 'picture' },
+        // { name: '照片', className: 'picture' },
         { name: '拍摄', className: 'camera' },
         { name: '语音通话', className: 'voice-call' },
         { name: '位置', className: 'location' },
@@ -251,20 +259,24 @@ export default {
   methods: {
     hideKeyboard () {
       this.showEmoji.f = true
+      this.showMoreOptions.f = false
       document.activeElement.blur()
     },
     showKeyboard () {
       this.showEmoji.f = false
       this.$refs.input.focus()
     },
+    isShowMoreOptions () {
+      this.showMoreOptions.f = !this.showMoreOptions.f
+      this.showEmoji.f = false
+    },
     isShowKeyboard (value, event) {
       if (this.showEmoji.f) {
         document.activeElement.blur()
       }
+      this.showMoreOptions.f = false
     },
-    isShowEmoji () {
-      this.showEmoji = !this.showEmoji
-    },
+
     goToBottom () {
       if (this.$refs.scrollerHeight.clientHeight > document.body.clientHeight) {
         const scrollerInnerHeight =
@@ -275,7 +287,9 @@ export default {
         this.$refs.scrollerEvent.reset({ top: scrollerInnerHeight })
       }
     },
-    send (params, event, type = 'mess') {
+    send (params, event, type) {
+      console.log('params, event, type', params, event, type)
+
       // 发送消息
       this.goToBottom()
       if (!this.message && !params) {
@@ -311,9 +325,8 @@ export default {
       this.$store.commit('setUnRead', {
         roomid: val.roomid,
         count: 0,
-        lastMes: val.mes
+        lastMes: val
       })
-      console.log('tyope', type)
 
       if (type === 'mess') {
         // 发送文字
@@ -329,9 +342,9 @@ export default {
     uploadFileSuccess (res, file) {
       // 上传成功
       if (file.raw.type.indexOf('image') > -1) {
-        this.send(res.data, 'img')
+        this.send(res.data, null, 'img')
       } else {
-        this.send(file, 'file')
+        this.send(file, null, 'file')
       }
       this.showMoreOptions.f = false
     },
@@ -339,22 +352,34 @@ export default {
       // 发送图片
       let f = this.$refs['chooseInmage'].files[0]
       if (f.type.indexOf('image') === -1) {
-        this.$message.error('只能上传图片!')
+        this.$vux.toast.show({
+          text: '只能上传图片!',
+          type: 'warn'
+        })
         return
       }
       const isLt1M = f.size / 1024 / 1024 < 1
       if (!isLt1M) {
-        this.$message.error('图片大小不能超过 1MB!')
+        // this.$message.error('图片大小不能超过 1MB!')
+        this.$vux.toast.show({
+          text: '图片大小不能超过 1MB!',
+          type: 'warn'
+        })
         return
       }
       let formdata = new FormData()
       formdata.append('f', f)
+
       api.uploadFile(formdata).then(r => {
         if (r.code === 0) {
-          this.send(r.data, 'img')
+          this.send(r.data, null, 'img')
         } else {
-          this.$message({
-            message: '上传失败',
+          // this.$message({
+          //   message: '上传失败',
+          //   type: 'warning'
+          // })
+          this.$vux.toast.show({
+            text: '上传失败',
             type: 'warning'
           })
         }
@@ -414,8 +439,14 @@ export default {
       this.message += em
     },
     chooseEmoji (url) {
-      this.send(url, 'emoji')
+      this.send(url, null, 'emoji')
       this.showEmoji.f = false
+    },
+    chooseFromMoreOptions (value) {
+      this.$vux.toast.show({
+        text: value.name,
+        type: 'success'
+      })
     },
     clear () {
       // 清空
@@ -425,14 +456,27 @@ export default {
 }
 </script>
 <style lang="scss">
+.picture-container{
+  position: relative;
+.upload-picture{
+  position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+}
+
 .explore_container {
   background-color: #f7f7fa;
 }
 .emoji-default {
   width: 100%;
-  height: 202px;
+  height: 170px;
   overflow-y: auto;
   padding: 10px;
+  background-color: #f7f7fa;
   li {
     display: inline-block;
     padding: 5px;
@@ -447,18 +491,19 @@ export default {
 }
 .moreOptions-default {
   width: 100%;
-  height: 202px;
+  padding: 10px;
+  height: 190px;
   background-color: #f7f7fa;
   // padding: 20px;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-
+box-sizing: border-box;
   li {
     box-sizing: border-box;
     width: 25%;
     list-style-type: none;
-    padding: 4%;
+    padding: 2%;
 
     .item-container {
       text-align: center;
@@ -468,11 +513,12 @@ export default {
 
       i {
         font-size: 35px;
-        color:  #d5d5d5
+        color:  #808080
       }
       p{
         font-size: 14px;
-        color:  #d5d5d5
+                color:  #808080
+
       }
     }
   }

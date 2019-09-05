@@ -1,6 +1,7 @@
 <template>
   <div class="contact_container">
     <x-header :left-options="{showBack: false}">通讯录</x-header>
+
     <scroller
       class="scroll"
       lock-x
@@ -11,6 +12,7 @@
     >
       <div >
         <div v-for="(item,index) in unReadRequest" :key="index" @click="goToFriendVerify(item)">
+
           <panel >
             <div slot="body" class="panel_container">
               <div class="avartar_container">
@@ -41,9 +43,7 @@ export default {
   data () {
     return {
       IMG_URL: env.imgUrl,
-
       scrollBoxHeight: '',
-
       other: require('../../assets/me.jpg'),
       unReadRequestList: [],
       initList: [

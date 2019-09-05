@@ -14,7 +14,7 @@
     >
     <div >
       <group v-for="(list,index) in listData" :key='index'>
-        <cell is-link :title="item.name" v-for="(item,i) in list" :key="i">
+        <cell is-link :title="item.name" v-for="(item,i) in list" :key="i" @click.native="exlpore(item.name)">
           <img
             slot="icon"
             width="35"
@@ -64,6 +64,16 @@ export default {
   methods: {
     onScrollBottom () {
       // console.log('onScrollBottom')
+    },
+    exlpore (value) {
+      if (value === '退出登录') {
+        this.showOptions = true
+      } else {
+        this.$vux.toast.show({
+          text: value + '功能开发中..',
+          type: 'warn'
+        })
+      }
     }
   }
 }

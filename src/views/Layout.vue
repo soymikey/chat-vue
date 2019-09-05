@@ -4,7 +4,6 @@
     <keep-alive>
       <router-view :key="$route.fullPath"></router-view>
     </keep-alive>
-
     <tabbar v-show="isMainNav">
       <tabbar-item link="/home" :badge="unReadCount !== 0?unReadCount.toString():null">
         <i slot="icon" class="iconfont icon-message"></i>
@@ -70,20 +69,22 @@ export default {
         this.$store.commit('setUnRead', {
           roomid: data[0].roomid,
           count: data.length,
-          lastMes: data[data.length - 1].mes
+          lastMes: data[data.length - 1]
         })
       } else {
         if (mesdata.length) {
           this.$store.commit('setUnRead', {
             roomid: mesdata[0].roomid,
             count: 0,
-            lastMes: mesdata[mesdata.length - 1].mes
+            lastMes: mesdata[mesdata.length - 1]
           })
         } else {
-          this.$store.commit('setUnRead', { roomid: 0, count: 0, lastMes: '' })
+          this.$store.commit('setUnRead', { roomid: 0, count: 0, lastMes: {} })
         }
       }
       if (validate.length) {
+        console.log('validate', validate)
+
         this.$store.commit('setUnReadRequest', {
           reset: false,
           content: validate

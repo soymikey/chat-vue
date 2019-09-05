@@ -15,7 +15,9 @@ const FriendVerify = r => require.ensure([], () => r(require('@/views/Contact/Fr
 
 const Explore = r => require.ensure([], () => r(require('@/views/Explore/Explore')), 'Explore')
 const User = r => require.ensure([], () => r(require('@/views/User/User')), 'User')
-const Login = r => require.ensure([], () => r(require('@/views/Login')), 'Login')
+const Setting = r => require.ensure([], () => r(require('@/views/User/Setting')), 'Setting')
+const Avatar = r => require.ensure([], () => r(require('@/views/User/Avatar')), 'Avatar')
+const UserInfo = r => require.ensure([], () => r(require('@/views/User/UserInfo')), 'UserInfo')
 const Register = r => require.ensure([], () => r(require('@/views/Register')), 'Register')
 
 Vue.use(Router)
@@ -80,10 +82,21 @@ export default new Router({
           component: User
         },
         {
-          path: '/login',
-          name: 'login',
-          component: Login
+          path: '/userinfo',
+          name: 'userinfo',
+          component: UserInfo
         },
+        {
+          path: '/avatar',
+          name: 'avatar',
+          component: Avatar
+        },
+        {
+          path: '/setting',
+          name: 'setting',
+          component: Setting
+        },
+
         {
           path: '/register',
           name: 'register',

@@ -91,6 +91,8 @@ export default {
     conversationsList: {
       handler (list) {
         this.contactsList = list
+        console.log(' this.contactsList', this.contactsList)
+
         this.contactsList = JSON.parse(JSON.stringify(list))
         if (!this.currSation.id && list.length) {
           this.$store.commit('setCurrSation', this.contactsList[0])
@@ -126,13 +128,15 @@ export default {
     },
     unRead: {
       handler (list) {
+        console.log(' this.contactsList', this.contactsList)
+
         this.contactsList.forEach((v, i) => {
           list.forEach(m => {
             if (v.id === m.roomid) {
               this.$set(
                 this.contactsList,
                 i,
-                Object.assign({}, v, { unRead: m.count, lastMes: m.lastMes })
+                Object.assign({}, v, { unRead: m.count, lastMes: m.lastMes.mes })
               )
             }
           })

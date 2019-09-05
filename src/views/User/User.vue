@@ -7,14 +7,13 @@
       class="scroll"
       lock-x
       :height="scrollBoxHeight"
-      @on-scroll-bottom="onScrollBottom"
       ref="scrollerBottom"
       :scroll-bottom-offst="200"
     >
       <div>
          <panel :list="personalList" type='1'></panel>
-        <group v-for="(list,index) in listData" :key="index">
-          <cell is-link :title="item.name" v-for="(item,i) in list" :key="i">
+        <group v-for="(list,index) in listData" :key="index" >
+          <cell is-link :title="item.name" v-for="(item,i) in list" :key="i"   @click.native="goToSetting(item.name)">
             <img slot="icon" width="35" style="display:block;margin-right:15px; " :src="item.icon" />
           </cell>
         </group>
@@ -24,18 +23,22 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import env from '../../../config/env'
+
 export default {
   data () {
     return {
       personalList: [
         {
-          src: require('../../assets/avartar.png'),
+          src: null,
           fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
-          title: '米高',
-          desc:
-            '微信号：soymikey',
-          url: '/conversation'
+          title: null,
+          desc: null,
+          url: '/userinfo'
+
         }],
+
       listData: {
         list: [
           { name: '支付', icon: require('../../assets/userpng/pay.png') }
@@ -60,11 +63,33 @@ export default {
   mounted () {
     this.scrollBoxHeight = document.documentElement.clientHeight - 46 - 54 + 'px'
   },
-  computed: {},
-  watch: {},
+  computed: {
+    ...mapState(['user'])
+  },
+  watch: {
+    user: {
+
+      handler () {
+        let imageUrl = env.imgUrl.slice(0, env.imgUrl.length - 1)
+
+        this.personalList[0].src = imageUrl + this.user.photo
+        this.personalList[0].title = this.user.name
+        this.personalList[0].desc = '微信号: ' + this.user.code
+      },
+      immediate: true,
+      deep: true
+    }
+  },
   methods: {
-    onScrollBottom () {
-      // console.log('onScrollBottom')
+    goToSetting (value) {
+      if (value === '设置') {
+        this.$router.push({ name: 'setting' })
+      } else {
+        this.$vux.toast.show({
+          text: value + '功能开发中..',
+          type: 'warn'
+        })
+      }
     }
   }
 }

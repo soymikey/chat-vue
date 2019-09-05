@@ -129,24 +129,23 @@ export default {
             }
             this.tabIndex = 0
           } else if (r.code === 1) {
-            this.$message.error('账号已存在')
+            this.toast('账号已存在', 'warn')
           } else {
-            this.$message.error('注册失败')
+            this.toast('注册失败', 'warn')
           }
           this.loading = false
         })
       }
     },
     login () {
-      // else if (
-      //   this.signForm.regcode.toLowerCase() !== this.initCode.toLowerCase()
-      // ) {
-      //   this.toast('验证码不正确', 'warn')
-      // }
       if (this.signForm.name === '') {
         this.toast('请输入账号', 'warn')
       } else if (this.signForm.pass === '') {
         this.toast('请输入密码', 'warn')
+      } else if (
+        this.signForm.regcode.toLowerCase() !== this.initCode.toLowerCase()
+      ) {
+        this.toast('验证码不正确', 'warn')
       } else {
         let params = {
           name: this.signForm.name,
@@ -157,6 +156,12 @@ export default {
           if (r.code === 0) {
             this.toast('登录成功')
             this.$store.dispatch('getUserInfo', this)
+            this.signForm = {
+              name: '',
+              pass: '',
+              repass: '',
+              regcode: ''
+            }
           } else if (r.code === -1) {
             this.toast('账号不存在或密码错误', 'cancel')
             this.loading = false

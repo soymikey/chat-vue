@@ -21,28 +21,21 @@ Vue.use(new VueSocketio({
 })
 )
 <template>
-<div class="test_container">
-
-  <div>
-        <cell :title="item.message" v-for="item in messageList" :key="{item}">
-
-          <img
-          v-if='item.sender!=="michael"'
-            slot="icon"
-            width="35"
-            style="display:block;margin-right:15px; "
-            :src='other'
-          />
-          <img
-        v-else
-            slot="value"
-            width="35"
-            style="display:block;margin-right:15px; "
-            :src='me'
-          />
-        </cell>
-      </div>
-</div></template>
+  <div class="test_container">
+    <div>
+      <cell :title="item.message" v-for="item in messageList" :key="{item}">
+        <img
+          v-if="item.sender!=="michael""
+          slot="icon"
+          width="35"
+          style="display:block;margin-right:15px; "
+          :src="other"
+        />
+        <img v-else slot="value" width="35" style="display:block;margin-right:15px; " :src="me" />
+      </cell>
+    </div>
+  </div>
+</template>
   <div v-for="item in messageList" :key="item" class="coversation_box-container">
  <!-- <div class="other_avatar_container"></div> -->
           <img class="other_avatar" width="35" height="35" :src="item.sender==='michael'?me:other"  />
@@ -65,6 +58,39 @@ export default {
 }
 </script>
 <style lang="scss">
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .view_container {
+    background-color: #fff;
+    flex: 1;
+  }
+  .carousel_container {
+    height: 50px;
+    background-color: red;
+
+    height: 110px;
+    overflow-y: scroll;
+    ul {
+      padding-left: 0;
+      white-space: nowrap;
+      overflow-x: visible;
+      // overflow-y: hidden;
+    }
+
+    li {
+      font-size: 20px;
+      display: inline-block;
+      list-style: none;
+      padding: 2px;
+      border: 1px solid cyan;
+      border-radius: 2px;
+      margin: 2px;
+      position: relative;
+    }
+  }
+}
 </style>
 
 <scroller lock-x :height="scrollBoxHeight" ref="scrollerBottom" :scroll-bottom-offst="250">
