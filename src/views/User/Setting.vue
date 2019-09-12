@@ -45,9 +45,13 @@ export default {
   },
   data () {
     return {
+
       options: [
-        { label: '退出登录',
-          type: 'warn' }
+        {
+          label: '退出登录',
+          type: 'warn',
+          value: 'exit'
+        }
       ],
 
       showOptions: false,
@@ -126,9 +130,12 @@ export default {
         })
       }
     },
-    handleOptions () {
-      this.loginOut()
+    handleOptions (key, item) {
+      if (key === 'exit') {
+        this.loginOut()
+      }
     }
+
   }
 }
 </script>

@@ -69,6 +69,8 @@ export default {
           lineNum: 2,
           dotNum: 10
         })
+        console.log('this.regCodeClass ', this.regCodeClass)
+
         this.regCodeClass.draw(r => {
           this.initCode = r
         })

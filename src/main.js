@@ -9,6 +9,7 @@ import VueSocketio from 'vue-socket.io'
 import socketio from 'socket.io-client'
 import { XButton, Tabbar, TabbarItem, Group, Cell, XHeader, Search, Scroller, Card, Confirm, Panel, XImg, Loading, LoadMore, XInput, Actionsheet, XTextarea, Badge, ButtonTab, ButtonTabItem, Toast, ToastPlugin } from 'vux'
 // import 'normalize.css'
+console.log('env.socketIo', env.socketIo)
 
 Vue.use(VueSocketio, socketio(env.socketIo))
 

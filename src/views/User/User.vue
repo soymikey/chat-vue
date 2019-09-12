@@ -32,7 +32,7 @@ export default {
       personalList: [
         {
           src: null,
-          fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
+          // fallbackSrc: 'http://placeholder.qiniudn.com/60x60/3cc51f/ffffff',
           title: null,
           desc: null,
           url: '/userinfo'

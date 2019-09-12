@@ -4,13 +4,15 @@
     <keep-alive>
       <router-view :key="$route.fullPath"></router-view>
     </keep-alive>
-    <tabbar v-show="isMainNav">
-      <tabbar-item link="/home" :badge="unReadCount !== 0?unReadCount.toString():null">
+
+    <tabbar style='position: fixed' v-show="isMainNav">
+      <tabbar-item  :selected="currentTabName==='home'" link="/home" :badge="unReadCount !== 0?unReadCount.toString():null">
         <i slot="icon" class="iconfont icon-message"></i>
         <span slot="label">微信</span>
       </tabbar-item>
 
       <tabbar-item
+      :selected="currentTabName==='contact'"
         link="/contact"
         :badge="unReadRequest.length!== 0?unReadRequest.length.toString():null"
       >
@@ -18,11 +20,11 @@
         <span slot="label">通讯录</span>
       </tabbar-item>
 
-      <tabbar-item link="/explore">
+      <tabbar-item :selected="currentTabName==='explore'" link="/explore">
         <i slot="icon" class="iconfont icon-explore"></i>
         <span slot="label">发现</span>
       </tabbar-item>
-      <tabbar-item link="/user">
+      <tabbar-item :selected="currentTabName==='user'" link="/user">
         <i slot="icon" class="iconfont icon-user"></i>
         <span slot="label">我</span>
       </tabbar-item>
@@ -118,7 +120,11 @@ export default {
       return (
         ['home', 'contact', 'explore', 'user'].indexOf(this.$route.name) !== -1
       )
+    },
+    currentTabName () {
+      return this.$route.name
     }
+
   },
   watch: {
     conversationsList: {

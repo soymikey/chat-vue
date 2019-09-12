@@ -91,7 +91,6 @@ export default {
     conversationsList: {
       handler (list) {
         this.contactsList = list
-        console.log(' this.contactsList', this.contactsList)
 
         this.contactsList = JSON.parse(JSON.stringify(list))
         if (!this.currSation.id && list.length) {
@@ -128,8 +127,6 @@ export default {
     },
     unRead: {
       handler (list) {
-        console.log(' this.contactsList', this.contactsList)
-
         this.contactsList.forEach((v, i) => {
           list.forEach(m => {
             if (v.id === m.roomid) {
